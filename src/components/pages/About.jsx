@@ -11,7 +11,6 @@ export default function About() {
                    continuously expanding my knowledge of the latest web frameworks and 
                    techniques. I am open to relocation for the right opportunity.
                 </p>
-                {/*This is for skills and tools i use*/}
                 <Skills />
             </div>
     

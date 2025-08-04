@@ -7,7 +7,7 @@ import { VscVscode } from "react-icons/vsc";
 
 export default function Skills() {
     return (
-        <div className="mt-20 px-4 text-white">
+        <div className="mt-10 pb-24 px-5 text-white">
             <h2 className="text-center text-3xl font-semibold mb-10">Tech Stack</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl mx-auto">
