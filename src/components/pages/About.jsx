@@ -9,7 +9,9 @@ export default function About() {
                 <p className='max-w-prose mx-auto text-2xl my-8 text-center'>
                    I am passionate about solving problems using modern technologies and 
                    continuously expanding my knowledge of the latest web frameworks and 
-                   techniques. I am open to relocation for the right opportunity.
+                   techniques. I am open to relocation for the right opportunity. In my spare time i do enjoy
+                   excercising, and would love to have the oppurtunity to be traveling to different cities
+                   here in the USA and eventually try and visit international cities
                 </p>
                 <Skills />
             </div>

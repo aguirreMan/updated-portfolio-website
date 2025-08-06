@@ -10,7 +10,7 @@ export default function Footer() {
                     className='hover:text-gray-500 transition-colors'>
                     <FaGithub />
                 </a>
-                <a href="https://linkedin.com/in/your-linkedin-username" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"
+                <a href="https://www.linkedin.com/in/manuel-aguirre-05a030198/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"
                     className="hover:text-blue-500 transition-colors">
                     <FaLinkedin />
                 </a>
