@@ -11,24 +11,24 @@ export default function Navbar() {
     <>
       {/* HEADER */}
       <header className='w-full absolute top-0 left-0 flex justify-between items-center p-4 bg-transparent z-20'>
-        <h1 className='text-2xl text-blue-800 font-bold'>MA</h1>
-
-        {/* NavLinks (Desktop Only) */}
+        <h1 className='text-3xl text-custom-text-color font-bold'>MA</h1>
         <div className='hidden md:flex gap-4'>
           <NavLinks />
         </div>
 
-        {/* Hamburger / Close Icon (Mobile Only) */}
         <div className='md:hidden cursor-pointer' onClick={toggleMenu}>
           {isOpen ? <IoMdClose size={24} /> : <GiHamburgerMenu size={24} />}
         </div>
       </header>
 
-      {/* Mobile Menu (Only when isOpen is true) */}
       {isOpen && (
-        <nav className='md:hidden absolute top-full left-0 w-full bg-white p-4 z-10 shadow-md'>
-          <NavLinks />
-        </nav>
+        <div className='fixed top-0 left-0 w-full h-full bg-white z-30 flex
+        justify-center items-center'
+          onClick={toggleMenu}>
+          <nav className='flex flex-col gap-4' onClick={(event) => event.stopPropagation()}>
+            <NavLinks />
+          </nav>
+        </div>
       )}
     </>
   )

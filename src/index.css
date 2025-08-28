@@ -1,2 +1,7 @@
 @import 'tailwindcss';
 
+@theme {
+    --color-custom-background-color: #2182BF;
+    --color-custom-text-color: #F29F80;
+}
+
