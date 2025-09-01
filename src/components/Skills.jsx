@@ -1,9 +1,9 @@
 import React from 'react';
-import { FaHtml5, FaCss3Alt, FaReact, FaGitAlt, FaGithub } from 'react-icons/fa';
-import { IoLogoJavascript } from 'react-icons/io';
-import { RiTailwindCssFill } from 'react-icons/ri';
-import { SiVite, SiNodedotjs, SiExpress, SiPostman } from 'react-icons/si';
-import { VscVscode } from "react-icons/vsc";
+import { FaHtml5, FaCss3Alt, FaReact, FaGitAlt, FaGithub } from 'react-icons/fa'
+import { IoLogoJavascript } from 'react-icons/io'
+import { RiTailwindCssFill } from 'react-icons/ri'
+import { SiVite, SiNodedotjs, SiExpress, SiPostman } from 'react-icons/si'
+import { VscVscode } from 'react-icons/vsc'
 
 export default function Skills() {
     return (
