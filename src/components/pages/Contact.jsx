@@ -3,6 +3,7 @@ import { FieldSet, FieldGroup, FieldLegend } from '../ui/field'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
+import { Button } from '../ui/button'
 
 export default function Contact() {
     return (
@@ -11,21 +12,22 @@ export default function Contact() {
                 Lets grab a cup of <Coffee className='w-10 h-10' strokeWidth={2.5} />
             </h1>
             <form className='w-full max-w-md mt-8 flex flex-col gap-6'>
-                <FieldGroup>
-                    <FieldSet>
-                        <FieldLegend>Name</FieldLegend>
-                    </FieldSet>
-                </FieldGroup>
-                <FieldGroup>
-                    <FieldSet>
-                        <FieldLegend>Email</FieldLegend>
-                    </FieldSet>
-                </FieldGroup>
-                <FieldGroup>
-                    <FieldSet>
-                        <FieldLegend>Message</FieldLegend>
-                    </FieldSet>
-                </FieldGroup>
+                <Input type='hidden' name='form-name' value='contact' />
+                <FieldSet>
+                    <Label>Name</Label>
+                    <Input name='name' type='text' required />
+                </FieldSet>
+                <FieldSet>
+                    <Label>Email</Label>
+                    <Input name='email' required />
+                </FieldSet>
+                <FieldSet>
+                    <Label>Lets schedule a coffee meeting</Label>
+                    <Textarea placeholder='Send message here' />
+                </FieldSet>
+                <Button
+                    className='cursor-pointer'
+                    type='submit'>Send Message</Button>
             </form>
         </div>
     )
