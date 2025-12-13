@@ -3,7 +3,7 @@ import { FaGithub, FaLinkedin } from 'react-icons/fa'
 
 export default function Footer() {
     return (
-        <footer className='fixed bottom-0 flex flex-col h-20 left-0 w-full text-white text-center items-center z-20 gap-2'>
+        <footer className='fixed bottom-0 flex flex-col justify-end w-full h-24 pb-4 text-white text-center items-center z-20'>
             <span className='text-2xl'>© {new Date().getFullYear()} Manuel Aguirre</span>
             <div className='flex justify-center items-center gap-6 text-4xl'>
                 <a

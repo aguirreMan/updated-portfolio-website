@@ -15,9 +15,9 @@ export default function Navbar() {
         <h1 className='text-3xl text-custom-text-color font-bold cursor-pointer'>
           <Link to='/'>MA</Link>
         </h1>
-        <div className='hidden md:flex gap-4'>
+        <nav className='hidden md:flex gap-8 text-white font-medium mr-6 mt-4'>
           <NavLinks />
-        </div>
+        </nav>
 
         <div className='md:hidden cursor-pointer' onClick={toggleMenu}>
           {isOpen ? <IoMdClose size={24} /> : <GiHamburgerMenu size={24} />}
@@ -28,11 +28,18 @@ export default function Navbar() {
         <div className='fixed top-0 left-0 w-full h-full bg-white z-30 flex
         justify-center items-center'
           onClick={toggleMenu}>
-          <nav className='flex flex-col gap-4' onClick={(event) => event.stopPropagation()}>
+          <nav
+            className='flex flex-col gap-4'
+            onClick={(event) => {
+              event.stopPropagation()
+              toggleMenu()
+            }}>
             <NavLinks />
           </nav>
-        </div>
-      )}
+
+        </div >
+      )
+      }
     </>
   )
 }
