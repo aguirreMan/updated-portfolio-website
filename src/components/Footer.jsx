@@ -1,4 +1,3 @@
-import React from 'react'
 import { FaGithub, FaLinkedin } from 'react-icons/fa'
 
 export default function Footer() {
@@ -11,7 +10,7 @@ export default function Footer() {
                     target='_blank'
                     rel='noopener noreferrer'
                     aria-label='GitHub'
-                    className='hover:text-gray-500 transition-transform duration-300 hover:scale-110'
+                    className='hover:text-[#24292e] transition-transform duration-300 hover:scale-110'
                 >
                     <FaGithub />
                 </a>
@@ -20,7 +19,7 @@ export default function Footer() {
                     target='_blank'
                     rel='noopener noreferrer'
                     aria-label='LinkedIn'
-                    className='hover:text-blue-500 transition-transform duration-300 hover:scale-110'
+                    className='hover:text-[#0077B5] transition-transform duration-300 hover:scale-110'
                 >
                     <FaLinkedin />
                 </a>

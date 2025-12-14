@@ -1,12 +1,14 @@
-import React from 'react'
-import { NavLink, Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
+import { motion } from 'framer-motion'
 
 export default function NavLinks() {
+
     function styleLinks({ isActive }) {
-        isActive
-            ? 'text-[#005de2] font-semibold border-b-2 border-[#005de2] pb-1'
+        return isActive
+            ? 'text-[#89a4d1] font-semibold border-b-2 border-[#005de2] pb-1'
             : 'text-white hover:text-[#005de2] transition-colors duration-200'
     }
+
     return (
         <>
             <NavLink to='/' className={styleLinks}>
@@ -24,4 +26,3 @@ export default function NavLinks() {
         </>
     )
 }
-
