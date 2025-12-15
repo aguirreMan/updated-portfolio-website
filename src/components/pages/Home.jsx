@@ -14,12 +14,13 @@ export default function Home() {
               key={index}
               initial={{ opacity: 0, x: -18 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 2.5, delay: index * 0.2 }} >
+              transition={{ duration: 1.8, delay: index * 0.2 }} >
               {char}
             </motion.span>
           ))}
         </h1>
-        <p className='text-[#0f0f0f] text-3xl mt-4 font-medium pb-6 tracking-wide'>Aspiring Front-End Developer</p>
+        <p className='text-[#0f0f0f] text-3xl mt-4 font-medium pb-6 
+        tracking-wide'>Front-End Web Developer</p>
         <Button />
       </div>
     </div>

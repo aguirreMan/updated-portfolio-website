@@ -8,38 +8,46 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const toggleMenu = () => setIsOpen(!isOpen)
 
+  function closeMobileMenu() {
+    setIsOpen(false)
+  }
+
   return (
     <>
       {/* HEADER */}
-      <header className='w-full absolute top-0 left-0 flex justify-between items-center p-4 bg-transparent z-20'>
-        <h1 className='text-3xl text-custom-text-color font-bold cursor-pointer'>
-          <Link className='text-[#259cf6]' to='/'>MA</Link>
+      <header className='w-full absolute top-0 left-0 flex justify-between items-center px-6 py-4 z-20'>
+        <h1 className='text-3xl font-bold'>
+          <Link className='text-[#259cf6] hover:text-[#005de2] transition-colors' to='/'>
+            MA
+          </Link>
         </h1>
-        <nav className='hidden md:flex gap-8 text-white font-medium mr-6 mt-4'>
-          <NavLinks />
-        </nav>
 
-        <div className='md:hidden cursor-pointer' onClick={toggleMenu}>
-          {isOpen ? <IoMdClose size={24} /> : <GiHamburgerMenu size={24} />}
+        {/* Desktop Nav */}
+        <div className='hidden md:block'>
+          <NavLinks />
         </div>
+
+        {/* Mobile Hamburger */}
+        <button
+          className='md:hidden text-white hover:text-[#005de2] transition-colors'
+          onClick={toggleMenu}
+          aria-label='Toggle menu'
+        >
+          {isOpen ? <IoMdClose size={28} /> : <GiHamburgerMenu size={28} />}
+        </button>
       </header>
 
+      {/* Mobile Menu */}
       {isOpen && (
-        <div className='fixed top-0 left-0 w-full h-full bg-white z-30 flex
-        justify-center items-center'
-          onClick={toggleMenu}>
-          <nav
-            className='flex flex-col gap-4'
-            onClick={(event) => {
-              event.stopPropagation()
-              toggleMenu()
-            }}>
-            <NavLinks />
-          </nav>
-
-        </div >
-      )
-      }
+        <div
+          className='fixed inset-0 bg-gradient-to-b from-[#00215b] via-[#131c29] to-[#101018] z-30 flex justify-center items-center'
+          onClick={toggleMenu}
+        >
+          <div onClick={(e) => e.stopPropagation()}>
+            <NavLinks isMobile onLinkClick={closeMobileMenu} />
+          </div>
+        </div>
+      )}
     </>
   )
 }
