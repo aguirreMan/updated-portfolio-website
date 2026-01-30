@@ -1,6 +1,6 @@
 import Home from './components/pages/Home.jsx'
 import './App.css'
-import Layout from './components/Layout.jsx'
+import Layout from './components/page-components/Layout.jsx'
 import About from './components/pages/About.jsx'
 import Projects from './components/pages/Projects.jsx'
 import Contact from './components/pages/Contact.jsx'

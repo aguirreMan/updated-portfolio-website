@@ -31,8 +31,8 @@ export default function NavLinks({ isMobile = false, onLinkClick }) {
                             <span
                                 className={
                                     isActive
-                                        ? 'text-[#89a4d1] font-bold'
-                                        : 'text-white hover:text-[#005de2] transition-colors duration-200'
+                                        ? 'text-foreground font-semibold'
+                                        : 'text-muted-foreground hover:text-foreground transition-colors duration-200'
                                 }
                             >
                                 {link.label}
@@ -40,7 +40,7 @@ export default function NavLinks({ isMobile = false, onLinkClick }) {
                             {isActive && !isMobile && (
                                 <motion.div
                                     layoutId='underline'
-                                    className='absolute left-0 right-0 -bottom-1 h-[2px] bg-[#005de2]'
+                                    className='absolute left-0 right-0 -bottom-1 h-[2px] bg-primary'
                                     transition={{
                                         type: 'spring',
                                         stiffness: 500,
