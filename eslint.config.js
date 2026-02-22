@@ -15,7 +15,11 @@ export default defineConfig([
     rules: {
       ...pluginReactHooks.configs.recommended.rules,
       semi: ['error', 'never'],
-      quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
+      quotes: [
+        'error',
+        'single',
+        { avoidEscape: true, allowTemplateLiterals: true },
+      ],
       'no-unused-expressions': 'error',
       'react/react-in-jsx-scope': 'off',
     },

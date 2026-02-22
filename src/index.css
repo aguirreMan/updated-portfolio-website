@@ -1,82 +1,80 @@
 @import 'tailwindcss';
-@import "tw-animate-css";
+@import 'tw-animate-css';
 @tailwind utilities;
 
-
 @theme inline {
-    --radius-md: calc(var(--radius) - 2px);
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --color-card: var(--card);
-    --color-card-foreground: var(--card-foreground);
-    --color-popover: var(--popover);
-    --color-popover-foreground: var(--popover-foreground);
-    --color-primary: var(--primary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-secondary: var(--secondary);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-muted: var(--muted);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-accent: var(--accent);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-destructive: var(--destructive);
-    --color-border: var(--border);
-    --color-input: var(--input);
-    --color-ring: var(--ring);
+  --radius-md: calc(var(--radius) - 2px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 }
 
 :root {
-    --radius: 0.625rem;
-    --background: #090C11;
-    --foreground: #E5E7EB;
-    --card: #0E141D;
-    --card-foreground: #E5E7EB;
-    --popover: #111B2A;
-    --popover-foreground: #E5E7EB;
-    --primary: #131E2F;
-    --primary-foreground: #E5E7EB;
-    --secondary: #152135;
-    --secondary-foreground: #E5E7EB;
-    --muted: #131E2F;
-    --muted-foreground: #9CA3AF;
-    --accent: #152135;
-    --accent-foreground: #E5E7EB;
-    --border: #131E2F;
-    --input: #131E2F;
-    --ring: #152135;
-}
-
-
-@layer base {
-    * {
-        @apply border-border outline-ring/50;
-    }
-
-    body {
-        @apply bg-background text-foreground;
-    }
+  --radius: 0.625rem;
+  --background: #090c11;
+  --foreground: #e5e7eb;
+  --card: #0e141d;
+  --card-foreground: #e5e7eb;
+  --popover: #111b2a;
+  --popover-foreground: #e5e7eb;
+  --primary: #131e2f;
+  --primary-foreground: #e5e7eb;
+  --secondary: #152135;
+  --secondary-foreground: #e5e7eb;
+  --muted: #131e2f;
+  --muted-foreground: #9ca3af;
+  --accent: #152135;
+  --accent-foreground: #e5e7eb;
+  --border: #131e2f;
+  --input: #131e2f;
+  --ring: #152135;
 }
 
 @layer base {
-    ::-webkit-scrollbar {
-        width: 8px;
-    }
+  * {
+    @apply border-border outline-ring/50;
+  }
 
-    ::-webkit-scrollbar-track {
-        background: rgba(16, 16, 24, 0.5);
-    }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
 
-    ::-webkit-scrollbar-thumb {
-        background: rgba(0, 33, 91, 0.6);
-        border-radius: 4px;
-    }
+@layer base {
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
 
-    ::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 33, 91, 0.9);
-    }
+  ::-webkit-scrollbar-track {
+    background: rgba(16, 16, 24, 0.5);
+  }
 
-    * {
-        scrollbar-width: thin;
-        scrollbar-color: rgba(0, 33, 91, 0.6) rgba(16, 16, 24, 0.5);
-    }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 33, 91, 0.6);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 33, 91, 0.9);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 33, 91, 0.6) rgba(16, 16, 24, 0.5);
+  }
 }
