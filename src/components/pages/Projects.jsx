@@ -35,22 +35,6 @@ export default function Projects() {
             liveLink: 'https://google.com',
             githubLink: 'https://google.com'
         },
-        {
-            title: 'GameShop',
-            description: 'A fictional online video game store built to learn more React practices with future rawg api for video game data',
-            stack: [
-                'React',
-                'React Router',
-                'Node Express JS',
-                'Typescript',
-                'Tailwind CSS',
-                'Railway',
-                'Vercel',
-                'Vite'
-            ],
-            liveLink: 'https://google.com',
-            githubLink: 'https://google.com'
-        }
     ]
     return (
         <div className='min-h-screen px-6 py-20'>
@@ -65,7 +49,7 @@ export default function Projects() {
                     </p>
                 </div>
 
-                <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                <div className='grid md:grid-cols-2 lg:grid-cols-2 gap-8'>
                     {projectData.map((project) => (
                         <ProjectCard
                             key={project.title}
