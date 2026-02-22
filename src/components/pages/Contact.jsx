@@ -11,7 +11,7 @@ export default function Contact() {
   const [formFields, setFormFields] = useState({ name: '', email: '', message: '' })
 
   function formChange(event) {
-    setFields(prev => ({ ...prev, [event.target.name]: event.target.value}))
+    setFormFields(prev => ({ ...prev, [event.target.name]: event.target.value}))
   }
 
   function encode(data) {
@@ -31,7 +31,7 @@ export default function Contact() {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: encode({ 'form-name': 'contact', ...formFields }),
-    }),
+    })
     setFormSubmit(true)
   }
 
