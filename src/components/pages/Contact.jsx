@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Coffee } from 'lucide-react'
 import { FieldSet } from '../ui/field'
 import { Label } from '../ui/label'
@@ -9,21 +10,33 @@ import { Button } from '../ui/button'
 export default function Contact() {
   const [formSubmit, setFormSubmit] = useState(false)
   const [formFields, setFormFields] = useState({ name: '', email: '', message: '' })
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (formSubmit) {
+      const timer =setTimeout(() => {
+        navigate('/')
+      }, 3000)
+      return () => {
+        clearTimeout(timer)
+      }
+    }
+  }, [formSubmit, navigate])
 
   function formChange(event) {
     setFormFields(prev => ({ ...prev, [event.target.name]: event.target.value}))
   }
 
   function encode(data) {
-      return Object.keys(data)
-        .map(
-          (key) =>
-            encodeURIComponent(key) +
+    return Object.keys(data)
+      .map(
+        (key) =>
+          encodeURIComponent(key) +
             '=' +
-            encodeURIComponent(data[key])
+          encodeURIComponent(data[key])
         )
         .join('&')
-    }
+  }
 
   async function submitForm(event) {
     event.preventDefault()
@@ -45,6 +58,9 @@ export default function Contact() {
           <Coffee className="w-10 h-10 text-muted-foreground" strokeWidth={2.5} />
         </h1>
         <p className="text-xl text-muted-foreground">Thank you for your message!</p>
+        <p className="text-md text-muted-foreground mt-2">
+          Redirecting to homepage...
+        </p>
       </div>
     )
   }

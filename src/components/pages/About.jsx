@@ -1,8 +1,10 @@
 import { GraduationCap, Code2, Briefcase } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
+import { Button } from '../ui/button'
 
 export default function About() {
   return (
+
     <div className="min-h-screen py-20 px-6">
       <div className="max-w-4xl mx-auto">
         {/* Hero Section */}
@@ -10,10 +12,15 @@ export default function About() {
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
             Front-end web engineer
           </h1>
-          <p className="text-xl text-foreground max-w-2xl mx-auto">
-            Building modern, responsive web applications with React, TypeScript
-            and Next JS
+          <p className="text-xl text-foreground max-w-2xl mx-auto pb-4">
+            I build responsive interfaces and maintainable frontend systems using React and TypeScript,
+            focusing on performance, accessibility, and clean component architecture.
           </p>
+          <Button asChild>
+             <a href="/assets/Manuel_Aguirre_Frontend_Engineer.pdf" target="_blank">
+               View Resume
+             </a>
+           </Button>
         </div>
         {/* About Content */}
 
@@ -33,6 +40,11 @@ export default function About() {
                   Des Moines Area Community College
                 </p>
                 <p className="text-muted-foreground">2023 - 2025</p>
+                <Button asChild className='mt-4'>
+                  <a href='/assets/Manuel_Aguirre_Frontend_Engineer.pdf' target='_blank'>
+                    View Resume
+                  </a>
+                </Button>
               </div>
             </CardContent>
           </Card>

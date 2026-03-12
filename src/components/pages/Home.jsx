@@ -12,7 +12,7 @@ export default function Home() {
         className="absolute inset-0 w-full h-full object-cover z-0"
       />
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-center">
-        <h1 className="text-4xl md:text-6xl font-bold text-primary tracking-wider">
+        <h1 className="text-4xl md:text-6xl font-bold text-muted-foreground tracking-wider">
           {name.split('').map((char, index) => (
             <motion.span
               key={index}
@@ -25,7 +25,7 @@ export default function Home() {
           ))}
         </h1>
         <p
-          className="text-foreground text-3xl mt-4 font-medium pb-6 
+          className="text-foreground text-3xl mt-4 font-medium pb-6
         tracking-wide"
         >
           Frontend Engineer building scalable, polished Web applications

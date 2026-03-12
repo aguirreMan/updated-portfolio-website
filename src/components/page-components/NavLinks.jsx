@@ -6,6 +6,7 @@ const links = [
   { label: 'About', to: '/about' },
   { label: 'Projects', to: '/projects' },
   { label: 'Contact', to: '/contact' },
+  { label: 'Resume', to: '/assets/Manuel_Aguirre_Frontend_Engineer.pdf', external: true },
 ]
 
 export default function NavLinks({ isMobile = false, onLinkClick }) {
@@ -17,40 +18,53 @@ export default function NavLinks({ isMobile = false, onLinkClick }) {
 
   return (
     <nav className={isMobile ? 'flex flex-col gap-6 text-2xl' : 'flex gap-8'}>
-      {links.map((link) => (
-        <NavLink
-          key={link.to}
-          to={link.to}
-          viewTransition
-          className="relative pb-1"
-          onClick={closeMobileMenu}
-        >
-          {({ isActive }) => (
-            <>
-              <span
-                className={
-                  isActive
-                    ? 'text-foreground font-semibold'
-                    : 'text-muted-foreground hover:text-foreground transition-colors duration-200'
-                }
-              >
-                {link.label}
-              </span>
-              {isActive && !isMobile && (
-                <motion.div
-                  layoutId="underline"
-                  className="absolute left-0 right-0 -bottom-1 h-[2px] bg-primary"
-                  transition={{
-                    type: 'spring',
-                    stiffness: 500,
-                    damping: 30,
-                  }}
-                />
-              )}
-            </>
-          )}
-        </NavLink>
-      ))}
+      {links.map((link) =>
+        link.external ? (
+          <a
+            key={link.to}
+            href={link.to}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-foreground transition-colors duration-200"
+            onClick={closeMobileMenu}
+          >
+            {link.label}
+          </a>
+        ) : (
+          <NavLink
+            key={link.to}
+            to={link.to}
+            viewTransition
+            className="relative pb-1"
+            onClick={closeMobileMenu}
+          >
+            {({ isActive }) => (
+              <>
+                <span
+                  className={
+                    isActive
+                      ? 'text-foreground font-semibold'
+                      : 'text-muted-foreground hover:text-foreground transition-colors duration-200'
+                  }
+                >
+                  {link.label}
+                </span>
+                {isActive && !isMobile && (
+                  <motion.div
+                    layoutId="underline"
+                    className="absolute left-0 right-0 -bottom-1 h-[2px] bg-primary"
+                    transition={{
+                      type: 'spring',
+                      stiffness: 500,
+                      damping: 30,
+                    }}
+                  />
+                )}
+              </>
+            )}
+          </NavLink>
+        )
+      )}
     </nav>
   )
 }
