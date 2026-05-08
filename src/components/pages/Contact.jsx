@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
 import { Coffee } from 'lucide-react'
 import { FieldSet } from '../ui/field'
 import { Label } from '../ui/label'
@@ -9,19 +8,16 @@ import { Button } from '../ui/button'
 
 export default function Contact() {
   const [formSubmit, setFormSubmit] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [formFields, setFormFields] = useState({ name: '', email: '', message: '' })
-  const navigate = useNavigate()
+  const [errorForm, setErrorForm] = useState(null)
+  const abortRef = useRef(null)
 
   useEffect(() => {
-    if (formSubmit) {
-      const timer =setTimeout(() => {
-        navigate('/')
-      }, 3000)
-      return () => {
-        clearTimeout(timer)
-      }
+    return () => {
+      abortRef.current?.abort()
     }
-  }, [formSubmit, navigate])
+  }, [])
 
   function formChange(event) {
     setFormFields(prev => ({ ...prev, [event.target.name]: event.target.value}))
@@ -40,39 +36,47 @@ export default function Contact() {
 
   async function submitForm(event) {
     event.preventDefault()
-    await fetch('/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: encode({ 'form-name': 'contact', ...formFields }),
-    })
-    setFormSubmit(true)
+    setErrorForm(null)
+    setSubmitting(true)
+
+    abortRef.current?.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
+
+    try {
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: encode({ 'form-name': 'contact', ...formFields }),
+        signal: controller.signal,
+      })
+      if (!response.ok) throw new Error('Failed to submit form')
+      setFormSubmit(true)
+    } catch (error) {
+      if (error.name === 'AbortError') return
+      setErrorForm('Something went wrong. Please try again or email me directly.')
+      setSubmitting(false)
+    }
   }
 
   if (formSubmit) {
     return (
-      <div className="flex flex-col items-center min-h-screen px-24
-        justify-center bg-background"
-      >
+      <div className="flex flex-col items-center min-h-screen px-6 md:px-24 justify-center bg-background">
         <h1 className="flex flex-row gap-2 text-4xl text-foreground">
-          Lets grab a cup of{' '}
-          <Coffee className="w-10 h-10 text-muted-foreground" strokeWidth={2.5} />
+          Let's grab a cup of{' '}
+          <Coffee className="w-10 h-10 text-amber-950" strokeWidth={2.5} />
         </h1>
         <p className="text-xl text-muted-foreground">Thank you for your message!</p>
-        <p className="text-md text-muted-foreground mt-2">
-          Redirecting to homepage...
-        </p>
       </div>
     )
   }
 
   return (
     <div
-      className="flex flex-col items-center min-h-screen px-24
-        justify-center bg-background"
-    >
+      className="flex flex-col items-center min-h-screen px-6 md:px-24 justify-center bg-background">
       <h1 className="flex flex-row gap-2 text-4xl text-foreground">
-        Lets grab a cup of{' '}
-        <Coffee className="w-10 h-10 text-muted-foreground" strokeWidth={2.5} />
+        Let's grab a cup of{' '}
+        <Coffee className="w-10 h-10 text-amber-950" strokeWidth={2.5} />
       </h1>
       <form
         name="contact"
@@ -109,7 +113,7 @@ export default function Contact() {
         </FieldSet>
         <FieldSet>
           <Label className="text-foreground font-medium text-sm">
-            Lets schedule a coffee meeting
+            Message
           </Label>
           <Textarea
             name="message"
@@ -119,9 +123,16 @@ export default function Contact() {
             onChange={formChange}
             className="transition-all duration-200 leading-relaxed"
           />
+
+          {errorForm && <p className="text-sm text-red-500 mt-2">{errorForm}</p>}
         </FieldSet>
-        <Button className="w-full cursor-pointer" size="lg" type="submit">
-          Send Message
+        <Button
+          className="w-full cursor-pointer"
+          size="lg"
+          type="submit"
+          disabled={submitting}
+        >
+          {submitting ? 'Sending...' : 'Send Message'}
         </Button>
       </form>
     </div>

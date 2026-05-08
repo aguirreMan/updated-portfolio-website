@@ -5,14 +5,22 @@ import { Link } from 'react-router-dom'
 export default function Home() {
   const name = 'Manuel Aguirre'
   return (
-    <div className="h-screen w-full absolute inset-0 bg-background/60">
+    <div className="relative min-h-screen w-full overflow-hidden">
       <img
         src="/assets/hero.png"
-        alt="Hero"
-        className="absolute inset-0 w-full h-full object-cover z-0"
+        alt=""
+        className="absolute inset-0 bg-black/50 w-full object-cover z-[1]"
       />
-      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center">
-        <h1 className="text-4xl md:text-6xl font-bold text-muted-foreground tracking-wider">
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4">
+        <motion.p
+          className="text-sm uppercase tracking-widest text-blue-400 mb-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          Frontend Engineer
+        </motion.p>
+        <h1 className="text-4xl md:text-6xl font-bold text-white tracking-wider drop-shadow-md">
           {name.split('').map((char, index) => (
             <motion.span
               key={index}
@@ -24,14 +32,11 @@ export default function Home() {
             </motion.span>
           ))}
         </h1>
-        <p
-          className="text-foreground text-3xl mt-4 font-medium pb-6
-        tracking-wide"
-        >
-          Frontend Engineer building scalable, polished Web applications
+        <p className="text-white/70 text-xl mt-4 font-medium pb-6 tracking-wide max-w-xl">
+          Building scalable, polished web applications with React, TypeScript, and modern tooling.
         </p>
         <Link to="/contact">
-          <Button size="lg">Lets have a cup of Coffee and talk!</Button>
+          <Button size="lg">Let’s talk frontend, AI & product engineering</Button>
         </Link>
       </div>
     </div>

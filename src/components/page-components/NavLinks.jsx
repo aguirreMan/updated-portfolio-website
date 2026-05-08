@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
 const links = [
-  { label: 'Home', to: '/' },
+  { label: 'Home', to: '/', end: true },
   { label: 'About', to: '/about' },
   { label: 'Projects', to: '/projects' },
   { label: 'Contact', to: '/contact' },
@@ -34,6 +34,7 @@ export default function NavLinks({ isMobile = false, onLinkClick }) {
           <NavLink
             key={link.to}
             to={link.to}
+            end={link.end}
             viewTransition
             className="relative pb-1"
             onClick={closeMobileMenu}

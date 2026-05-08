@@ -1,116 +1,117 @@
-import { GraduationCap, Code2, Briefcase } from 'lucide-react'
+import { GraduationCap, Code2, Briefcase, MapPin } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
-import { Button } from '../ui/button'
+
+const frontendSkills = [
+  'React', 'TypeScript', 'Next.js', 'React Router',
+  'TanStack Query', 'Vite', 'Tailwind CSS', 'shadcn/ui',
+]
+
+const infraSkills = [
+  'Node.js', 'Express', 'Supabase', 'Clerk',
+  'Vercel', 'Netlify', 'Railway', 'Postman',
+]
+
+function Badge({ children }) {
+  return (
+    <span className="text-xs px-2.5 py-1 rounded-md border border-border bg-muted text-muted-foreground">
+      {children}
+    </span>
+  )
+}
 
 export default function About() {
   return (
-
     <div className="min-h-screen py-20 px-6">
       <div className="max-w-4xl mx-auto">
-        {/* Hero Section */}
-        <div className="text-center mb-16">
+
+        {/* Hero */}
+        <div className="text-center mb-12 pb-10 border-b border-border">
+          <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
+            About me
+          </p>
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Front-end web engineer
+            Frontend engineer focused on React & TypeScript
           </h1>
-          <p className="text-xl text-foreground max-w-2xl mx-auto pb-4">
-            I build responsive interfaces and maintainable frontend systems using React and TypeScript,
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6 leading-relaxed">
+            I build responsive interfaces and maintainable frontend systems,
             focusing on performance, accessibility, and clean component architecture.
           </p>
-          <Button asChild>
-             <a href="/assets/Manuel_Aguirre_Frontend_Engineer.pdf" target="_blank">
-               View Resume
-             </a>
-           </Button>
         </div>
-        {/* About Content */}
 
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
-          {/* Education */}
+        {/* Education + Focus */}
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
           <Card>
-            <CardHeader className="flex items-center">
-              <GraduationCap className="text-muted-foreground" size={28} />
-              <CardTitle>Education</CardTitle>
+            <CardHeader className="flex flex-row items-center gap-3 pb-3">
+              <GraduationCap className="text-muted-foreground" size={22} />
+              <CardTitle className="text-base">Education</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-muted-foreground">
-                <h3 className="font-medium text-lg text-foreground mb-3">
-                  Associate Degree in Web Development
-                </h3>
-                <p className="text-muted-foreground mb-3">
-                  Des Moines Area Community College
-                </p>
-                <p className="text-muted-foreground">2023 - 2025</p>
-                <Button asChild className='mt-4'>
-                  <a href='/assets/Manuel_Aguirre_Frontend_Engineer.pdf' target='_blank'>
-                    View Resume
-                  </a>
-                </Button>
-              </div>
+              <p className="font-medium text-foreground mb-1">
+                A.A.S. Web Development
+              </p>
+              <p className="text-sm text-muted-foreground">Des Moines Area Community College</p>
+              <p className="text-sm text-muted-foreground">2023 – 2025</p>
             </CardContent>
           </Card>
 
-          {/* Experience/Focus */}
           <Card>
-            <CardHeader className="flex items-center mb-2">
-              <Code2 className="text-foreground" size={28} />
-              <CardTitle>Focus</CardTitle>
+            <CardHeader className="flex flex-row items-center gap-3 pb-3">
+              <Code2 className="text-muted-foreground" size={22} />
+              <CardTitle className="text-base">Focus</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground leading-relaxed">
-                Specializing in building dynamic, user-friendly web applications
-                using React, TypeScript, and modern CSS frameworks. Passionate
-                about clean code, responsive design, and creating seamless user
-                experiences.
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Focused on scalable React applications, frontend architecture,
+                and building polished developer experiences.
               </p>
             </CardContent>
           </Card>
         </div>
 
-        {/*Tech and tooling */}
-        <section className="mt-10">
-          <h2 className="mb-10 text-center font-semibold text-foreground">
-            Skills & Tooling
-          </h2>
-          {/*Cards for skills */}
-          <div className="grid gap-8 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Frontend tooling</CardTitle>
-              </CardHeader>
-              <CardContent className="text-muted-foreground space-y-2">
-                <p>React, Next.JS, Typescript</p>
-                <p>React router, Tanstack Query, Vite</p>
-                <p>Tailwind CSS, Shadcn/ui, responsive designs</p>
-              </CardContent>
-            </Card>
-            {/*Card for backend tooling */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Backend & infrastructure tooling</CardTitle>
-              </CardHeader>
-              <CardContent className="text-muted-foreground space-y-2">
-                <p>Node JS, Express JS</p>
-                <p>Supabase, Clerk</p>
-                <p>Railway, Postman, Vercel, Netlify</p>
-              </CardContent>
-            </Card>
-            {/* Finding work */}
-            <Card className="md:col-span-2">
-              <CardHeader className="flex flex-row items-center gap-3">
-                <Briefcase className="text-primary" size={28} />
-                <CardTitle>What I am Looking For</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
-                  I'm seeking opportunities to join a collaborative development
-                  team where I can contribute my front-end skills and continue
-                  growing as a developer. Open to relocation for the right
-                  opportunity.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
+        {/* Skills */}
+        <Card className="mb-6">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base text-center">Skills & tooling</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
+                Frontend
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {frontendSkills.map((s) => <Badge key={s}>{s}</Badge>)}
+              </div>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
+                Backend & infrastructure
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {infraSkills.map((s) => <Badge key={s}>{s}</Badge>)}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Looking for */}
+        <Card>
+          <CardHeader className="flex flex-row items-center gap-3 pb-3">
+            <Briefcase className="text-primary" size={22} />
+            <CardTitle className="text-base">What I'm looking for</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+              Seeking a collaborative frontend role where I can contribute
+              immediately and keep growing. Currently based in Iowa and
+              targeting opportunities in the LA area — open to relocation.
+            </p>
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <MapPin size={13} />
+              Iowa → Los Angeles, CA
+            </div>
+          </CardContent>
+        </Card>
+
       </div>
     </div>
   )

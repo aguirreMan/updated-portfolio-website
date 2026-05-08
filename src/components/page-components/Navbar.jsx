@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import NavLinks from '../page-components/NavLinks'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import { IoMdClose } from 'react-icons/io'
@@ -6,47 +6,43 @@ import { Link } from 'react-router-dom'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
-  const toggleMenu = () => setIsOpen(!isOpen)
 
-  function closeMobileMenu() {
-    setIsOpen(false)
-  }
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKey = (e) => { if (e.key === 'Escape') setIsOpen(false) }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [isOpen])
 
   return (
     <>
-      {/* Header */}
-      <header className="w-full absolute top-0 left-0 flex justify-between items-center px-6 py-4 z-20">
+      <nav className="w-full absolute top-0 left-0 flex justify-between items-center px-6 py-4 z-20">
         <Link
           to="/"
-          className="text-lg font-semibold tracking-wide text-muted-foreground 
-                    transition-colors hover:text-foreground"
+          className="text-lg font-semibold tracking-wide text-foreground
+                     transition-colors hover:text-primary"
         >
           MA
         </Link>
-
-        {/* Desktop Nav */}
         <div className="hidden md:block">
           <NavLinks />
         </div>
-
-        {/* Mobile Hamburger */}
         <button
-          className="md:hidden text-muted-foreground hover:text-foreground transition-colors"
-          onClick={toggleMenu}
+          className="md:hidden text-foreground hover:text-primary transition-colors"
+          onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle menu"
         >
           {isOpen ? <IoMdClose size={24} /> : <GiHamburgerMenu size={24} />}
         </button>
-      </header>
+      </nav>
 
-      {/* Mobile Menu */}
       {isOpen && (
         <div
           className="fixed inset-0 z-30 flex justify-center items-center bg-background"
-          onClick={toggleMenu}
+          onClick={() => setIsOpen(false)}
         >
           <div onClick={(e) => e.stopPropagation()}>
-            <NavLinks isMobile onLinkClick={closeMobileMenu} />
+            <NavLinks isMobile onLinkClick={() => setIsOpen(false)} />
           </div>
         </div>
       )}

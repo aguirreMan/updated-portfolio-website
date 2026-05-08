@@ -1,64 +1,40 @@
 import ProjectCard from '../page-components/ProjectCard'
 
+const projectData = [
+  {
+    title: 'Gorilla AI',
+    description:
+      'AI-powered learning accelerator — conversational, adaptive to skill level, and scoped to research and learning workflows. Built with full auth, rate limiting, and chat persistence.',
+    stack: ['Next.js', 'React', 'TypeScript', 'Tailwind', 'shadcn/ui', 'TanStack Query', 'Clerk', 'Supabase', 'Vercel'],
+    liveLink: 'https://gorilla-ai-theta.vercel.app/',
+    githubLink: 'https://github.com/aguirreMan/gorilla-ai',
+    blogSlug: 'gorilla-ai',
+  },
+  {
+    title: 'Recipe App',
+    description:
+      'Full-stack recipe discovery app powered by the Spoonacular API. Search, browse, and save recipes with a Node/Express backend and a React frontend.',
+    stack: ['React', 'TypeScript', 'React Router', 'Node.js', 'Express', 'Tailwind CSS', 'Vercel', 'Railway', 'Vite'],
+    liveLink: 'https://react-recipe-blush.vercel.app/',
+    githubLink: 'https://github.com/aguirreMan/react-recipe',
+    blogSlug: 'recipe-app',
+  },
+]
+
 export default function Projects() {
-  const projectData = [
-    {
-      title: 'Gorilla AI',
-      description:
-        'Full-stack AI image generation platform with auth, credits, and gallery.',
-      stack: [
-        'Next.js',
-        'React',
-        'TypeScript',
-        'Tailwind',
-        'shadcn/ui',
-        'Tanstack Query',
-        'Clerk',
-        'Supabase',
-        'Vercel',
-      ],
-      liveLink: 'https://google.com',
-      githubLink: 'https://github.com/aguirreMan/gorilla-ai',
-    },
-    {
-      title: 'Recipe App',
-      description:
-        'A recipe app i built to teach myself to cook new recipes using data from spoonacular api hosted on railway and vercel',
-      stack: [
-        'React',
-        'React router',
-        'Node Express JS',
-        'Typescript',
-        'Tailwind CSS',
-        'Vercel',
-        'Railway',
-        'Vite',
-      ],
-      liveLink: 'https://react-recipe-blush.vercel.app/',
-      githubLink: 'https://github.com/aguirreMan/react-recipe',
-    },
-  ]
   return (
     <div className="min-h-screen px-6 py-20">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
+          <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Work</p>
           <h1 className="mb-4 text-4xl font-bold text-foreground">Projects</h1>
           <p className="mx-auto max-w-2xl text-muted-foreground">
-            A selection of projects demonstrating my experience building modern,
-            scalable web applications.
+            A selection of projects demonstrating my experience building modern, scalable web applications.
           </p>
         </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-8">
           {projectData.map((project) => (
-            <ProjectCard
-              key={project.title}
-              title={project.title}
-              description={project.description}
-              stack={project.stack}
-              liveLink={project.liveLink}
-              githubLink={project.githubLink}
-            />
+            <ProjectCard key={project.title} {...project} />
           ))}
         </div>
       </div>
