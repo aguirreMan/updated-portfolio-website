@@ -9,7 +9,7 @@ export default function Home() {
       <img
         src="/assets/hero.png"
         alt=""
-        className="absolute inset-0 bg-black/50 w-full object-cover z-[1]"
+        className="absolute inset-0 w-full h-full object-cover z-[1]"
       />
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4">
         <motion.p

@@ -29,7 +29,7 @@ export default function ProjectCard({ title, description, stack, liveLink, githu
         </Button>
         {blogSlug && (
           <Link
-            to={`/projects/${caseStudy}`}
+            to={`/projects/${blogSlug}`}
             className="ml-auto text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center gap-1"
           >
             Case study →

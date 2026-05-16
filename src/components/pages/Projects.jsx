@@ -17,7 +17,7 @@ const projectData = [
     stack: ['React', 'TypeScript', 'React Router', 'Node.js', 'Express', 'Tailwind CSS', 'Vercel', 'Railway', 'Vite'],
     liveLink: 'https://react-recipe-blush.vercel.app/',
     githubLink: 'https://github.com/aguirreMan/react-recipe',
-    blogSlug: 'recipe-app',
+    blogSlug: 'recipe-study',
   },
 ]
 
