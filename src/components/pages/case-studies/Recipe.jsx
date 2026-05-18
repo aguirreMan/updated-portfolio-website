@@ -21,84 +21,220 @@ export default function Recipe() {
       />
 
 
-      <CaseStudySection id='overview' title ='Overview'>
+      <CaseStudySection id='overview' title='Overview'>
         <p className='text-muted-foreground leading-7 max-w-2xl'>
-          Built in Express to Proxy Spoonacular api calls
+          Recipe discovery application built with React and TypeScript using the
+          Spoonacular API for recipe search, category filtering, and ingredient
+          scaling. The project evolved from a simple college assignment into a
+          full-stack application with an Express proxy server and some basic caching of recipes.
         </p>
       </CaseStudySection>
 
-
-      <section id='why' className='scroll-mt-24'>
-        <h2 className='text-2xl font-semibold mb-4'>Why I rebuilt it</h2>
+      <CaseStudySection id='origin' title='Project evolution'>
         <p className='text-muted-foreground leading-7 max-w-2xl'>
-          After college I rebuilt it in vanilla JS with the Spoonacular API so I
-          could actually search and browse recipes by category. That version worked
-          but had a real problem — I was exposing the API key directly on the
-          frontend. Once I caught that I added a small Express server to proxy the
-          requests and keep the key server-side.
+          This project originally started as a community college assignment focused on
+          building a small recipe application using hardcoded data. That approach was
+          completely reasonable for the requirments of the class, but it became limiting once
+          I wanted to browse a larger variety of recipes, search dynamically, and work
+          with real recipe data like ingredients and cooking instructions.
         </p>
-        <p className='text-muted-foreground leading-7 max-w-2xl mt-4'>
-          The third rebuild came when I started learning React and TypeScript. The
-          vanilla JS version was getting hard to manage and I wanted to do it right.
-          Same app, better foundation.
-        </p>
-      </section>
 
-      <section id='decisions' className='scroll-mt-24'>
-        <h2 className='text-2xl font-semibold mb-4'>Technical decisions</h2>
+        <p className='text-muted-foreground leading-7 max-w-2xl mt-4'>
+          After finishing college, I revisited the project on my own and rebuilt it
+          around the Spoonacular API so recipes could be fetched dynamically instead of
+          maintained manually. Over time the project went through multiple rebuilds as
+          I learned more about frontend architecture, API design, and maintainable state
+          management.
+        </p>
+      </CaseStudySection>
+
+      <CaseStudySection id='evolution' title='Refactors'>
+        <p className='text-muted-foreground leading-7 max-w-2xl'>
+          The second version of the project also used vanilla javascript but this time i did implement
+          Spoonacular API and spoonacular solved the problem of having an abundance of recipe data.
+        </p>
+
+        <p className='text-muted-foreground leading-7 max-w-2xl mt-4'>
+          As the application expanded, new frontend challenges started appearing. Recipe
+          details were rendered inside modals, which became limiting once ingredient scaling,
+          instructions, and larger recipe content needed more space and better navigation.
+          Shared state like pagination and search queries also became harder to coordinate
+          across multiple functions as more API endpoints and UI interactions were added.
+        </p>
+
+        <p className='text-muted-foreground leading-7 max-w-2xl mt-4'>
+          Managing DOM updates and reattaching event listeners manually after rerenders also
+          added complexity over time. While these patterns work in vanilla JavaScript, I found
+          myself recreating problems that React solves elegantly.
+        </p>
+
+        <p className='text-muted-foreground leading-7 max-w-2xl mt-4'>
+          Rebuilding the project again in React and React Router gave me dedicated routing,
+          reusable components, more predictable state management, and a cleaner structure for
+          working with API-driven frontend applications as the project continued to grow.  Adding Typescript
+          helped me type data contracts across the entire application
+        </p>
+      </CaseStudySection>
+
+      <CaseStudySection id='challenges' title='Challenges encountered'>
         <ul className='space-y-6 text-muted-foreground leading-7 max-w-2xl'>
           <li>
-            <strong className='text-foreground'>Spoonacular over a custom dataset</strong>
-            <p>I needed real recipes at scale. Spoonacular gives me search, category
-            browsing, and hundreds of recipes without me maintaining any data myself.
-            For an app built around discovery that was the obvious call.</p>
+            <strong className='text-foreground'>Adding a backend changed the project scope</strong>
+            <p>
+              Moving from a frontend-only app to an Express server solves API key exposure problem,
+              but it also introduced new responsibilities like routing,
+              CORS, environment variables, response formatting, and deploying a separate
+              backend service.
+            </p>
           </li>
+
           <li>
-            <strong className='text-foreground'>Express proxy for the API key</strong>
-            <p>The vanilla JS version exposed the Spoonacular key directly in the
-            frontend. That's a real security problem — anyone reading the network
-            tab could grab it. A lightweight Express server keeps the key
-            server-side and the frontend never touches it.</p>
+            <strong className='text-foreground'>Learning React Router changed how I thought about UI</strong>
+            <p>
+              The vanilla JavaScript version used modals for recipe details, but that became
+              limiting as the content grew. Learning React Router helped me move recipe
+              details into dedicated pages with cleaner navigation and shareable URLs.
+            </p>
           </li>
+
           <li>
-            <strong className='text-foreground'>TypeScript for servings scaling</strong>
-            <p>In vanilla JS I was parsing ingredient amounts as strings and doing
-            math on them manually. TypeScript meant ingredient amounts were typed
-            as numbers from the start — scaling just works and the compiler catches
-            mistakes before they ever hit the browser.</p>
-          </li>
-          <li>
-            <strong className='text-foreground'>SQLite for caching</strong>
-            <p>Added basic caching to reduce redundant Spoonacular API hits. Honestly
-            this was more about trying something new than a hard requirement — the
-            app would run fine without it. But it was a good excuse to learn how
-            a simple caching layer works in practice.</p>
+            <strong className='text-foreground'>Deployment became more complex</strong>
+            <p>
+              Hosting the frontend on Vercel came with its own challenges, but the Express
+              backend required a separate deployment flow entirely. Using Railway taught me
+              how frontend and backend deployments differ, especially when working with
+              environment variables and API URLs across local and production environments.
+            </p>
           </li>
         </ul>
-      </section>
+      </CaseStudySection>
 
-      <section id='differently' className='scroll-mt-24'>
-        <h2 className='text-2xl font-semibold mb-4'>What I'd change</h2>
-        <p className='text-muted-foreground leading-7 max-w-2xl'>
-          The Express server is minimal by design but if I started over I'd
-          think harder about the API layer earlier instead of adding it as a
-          patch. I'd also be more deliberate about component reuse from the
-          start — I had duplicate button components with the same styles before
-          I consolidated them, which is exactly the kind of thing a shared
-          component system solves.
-        </p>
-      </section>
+      <CaseStudySection id='decisions' title='Technical decisions'>
+        <ul>
+          <li>
+            <strong className='text-foreground'>
+              Formatting API data on the backend
+            </strong>
 
-      <section id='future' className='scroll-mt-24'>
-        <h2 className='text-2xl font-semibold mb-4'>Future work</h2>
-        <p className='text-muted-foreground leading-7 max-w-2xl'>
-          This app is in maintenance mode. It does what I built it to do.
-          If I came back to it the most useful addition would be saved recipes
-          with a real database instead of local storage, so the list persists
-          across devices. That's the one thing that would make it more useful
-          day to day.
-        </p>
-      </section>
+            <p>
+              While testing Spoonacular endpoints in Postman, I noticed the API returned
+              significantly more data than the frontend actually needed, including nutrition
+              details and cooking equipment that were outside the scope of data i needed.
+            </p>
+
+            <p className='mt-4'>
+              Instead of passing raw API responses directly into the frontend, I chose to
+              format recipe data like instructions and ingredients inside the Express server before returning it
+              to the frontend. This reduced frontend complexity and kept React components more
+              focused on rendering UI instead of transforming nested API responses.
+            </p>
+          </li>
+          <li>
+            <strong className='text-foreground'>
+              TypeScript for ingredient scaling and API contracts
+            </strong>
+
+            <p>
+              The vanilla JavaScript version parsed ingredient amounts out of formatted
+              strings using <code>split</code> and <code>parseFloat</code>. If the API
+              response format changed or a value was missing, the scaling logic could
+              silently return <code>NaN</code> and break calculations without obvious
+              errors.
+            </p>
+
+            <div className='bg-muted rounded-lg p-4 mt-4 overflow-x-auto'>
+              <pre>
+                {`const parts = currentDataString.split(':')[1].trim().split(' ')
+                  const originalAmount = parseFloat(parts[0])`}
+              </pre>
+            </div>
+
+            <p className='mt-4'>
+              After rebuilding the project in TypeScript, ingredient measurements were
+              modeled as explicit numeric values instead of parsed strings.
+            </p>
+
+            <div className='bg-muted rounded-lg p-4 mt-4 overflow-x-auto'>
+              <pre>
+                {`export interface MeasureUnit {
+                    amount: number
+                    unitShort: string
+                }`}
+              </pre>
+            </div>
+
+            <p className='mt-4'>
+              That allowed the scaling logic to become simple arithmetic instead of
+              defensive string parsing:
+            </p>
+
+            <div className='bg-muted rounded-lg p-4 mt-4 overflow-x-auto'>
+              <pre>
+                {`const scaledAmountUS =
+                  ingredient.measures.us.amount * scaleFormula`}
+              </pre>
+            </div>
+
+            <p className='mt-4'>
+              Typing the API contracts up front made the scaling logic easier to reason
+              about and removed an entire category of parsing edge cases from the frontend.
+            </p>
+          </li>
+          <li>
+            <strong className='text-foreground'>
+              SQLite caching for repeated recipe requests
+            </strong>
+
+            <p>
+              Recipe instructions and ingredient data were fetched from multiple Spoonacular
+              endpoints, which introduced redundant API requests when the same recipe was
+              viewed repeatedly.
+            </p>
+
+            <p className='mt-4'>
+              To reduce unnecessary external API calls, I added a lightweight SQLite caching
+              layer inside the Express server. Cached recipe data could be returned directly
+              from the backend instead of requesting the same data from Spoonacular again.
+            </p>
+
+            <p className='mt-4'>
+              The application did not strictly require caching at its current scale, but it
+              was a useful way to learn how backend caching changes request flow and reduces
+              dependency on third-party APIs.
+            </p>
+          </li>
+        </ul>
+      </CaseStudySection>
+
+      <CaseStudySection id='differently' title='Differently'>
+        <ul>
+          <li>
+            <strong className='text-foreground'>
+              Using Mock Data for testing while developing in many points of working on my application
+              I burned all of spoonaculars data making fetch calls there what i would change again is create some Mock
+              recipes instead of using the real API.
+            </strong>
+          </li>
+          <li>
+            <strong className='text-foreground'>
+              I would implement abort controllers from the beginning especially for a quota based API
+            </strong>
+          </li>
+          <li>
+            <strong className='text-foreground'>
+              I would create a design token system to define consistent UI components and styles across the project.
+              The issue i did was re create different buttons for each component, leading to inconsistent
+              styling.
+            </strong>
+          </li>
+          <li>
+            <strong className='text-foreground'>
+              For working on projects that grow in complexity, I would implement a stronger folder structure to make
+              my workflow more efficient.
+            </strong>
+          </li>
+        </ul>
+      </CaseStudySection>
 
     </div>
   )

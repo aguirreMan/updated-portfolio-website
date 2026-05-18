@@ -4,11 +4,12 @@ import { ArrowLeft } from 'lucide-react'
 
 const sections = [
   { id: 'overview', label: 'Overview' },
-  { id: 'origin', label: 'Origin' },
-  { id: 'why', label: 'Why I rebuilt it' },
+  { id: 'origin', label: 'How it started' },
+  { id: 'evolution', label: 'Why I rebuilt it' },
+  { id: 'challenges', label: 'Challenges encountered' },
   { id: 'decisions', label: 'Technical decisions' },
-  { id: 'differently', label: "What I'd change" },
-  { id: 'future', label: 'Future work' }
+  { id: 'differently', label: "What I'd change if I started over today" },
+  { id: 'future', label: 'Future work and improvements' }
 ]
 
 export default function CaseStudyLayout() {
@@ -19,13 +20,12 @@ export default function CaseStudyLayout() {
   }, [])
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
-        if (visible[0]) setActiveSection(visible[0].target.id)
-      },
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter((e) => e.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+      if (visible[0]) setActiveSection(visible[0].target.id)
+    },
       { rootMargin: '-40% 0px -55% 0px', threshold: 0 }
     )
 
@@ -74,5 +74,5 @@ export default function CaseStudyLayout() {
           </div>
         </div>
       </div>
-    )
-  }
+  )
+}
