@@ -19,6 +19,18 @@ const projectData = [
     githubLink: 'https://github.com/aguirreMan/react-recipe',
     blogSlug: 'recipe-study',
   },
+  {
+    title: 'Portfolio Website',
+    description: `
+      A multi-page developer portfolio focused on long-form case studies,
+      reusable UI architecture, and documenting the evolution of projects
+      through engineering decisions and technical tradeoffs.
+    `,
+    stack: ['React', 'React Router', 'Tailwind CSS', 'Shadcn UI', 'Framer Motion', 'Netlify'],
+    liveLink: 'https://manuelaguirre.dev/',
+    githubLink: 'https://github.com/aguirreMan/updated-portfolio-website',
+    blogSlug: 'portfolio-evolution',
+  }
 ]
 
 export default function Projects() {
@@ -32,7 +44,7 @@ export default function Projects() {
             A selection of projects demonstrating my experience building modern, scalable web applications.
           </p>
         </div>
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-3 gap-8">
           {projectData.map((project) => (
             <ProjectCard key={project.title} {...project} />
           ))}

@@ -50,7 +50,7 @@ export default function Recipe() {
 
       <CaseStudySection id='evolution' title='Refactors'>
         <p className='text-muted-foreground leading-7 max-w-2xl'>
-          The second version of the project also used vanilla javascript but this time i did implement
+          The second version of the project also used vanilla JavaScript but this time i integrated the
           Spoonacular API and spoonacular solved the problem of having an abundance of recipe data.
         </p>
 
@@ -71,8 +71,7 @@ export default function Recipe() {
         <p className='text-muted-foreground leading-7 max-w-2xl mt-4'>
           Rebuilding the project again in React and React Router gave me dedicated routing,
           reusable components, more predictable state management, and a cleaner structure for
-          working with API-driven frontend applications as the project continued to grow.  Adding Typescript
-          helped me type data contracts across the entire application
+          working with API-driven frontend applications as the project continued to grow.
         </p>
       </CaseStudySection>
 
@@ -119,7 +118,7 @@ export default function Recipe() {
             <p>
               While testing Spoonacular endpoints in Postman, I noticed the API returned
               significantly more data than the frontend actually needed, including nutrition
-              details and cooking equipment that were outside the scope of data i needed.
+              details and cooking equipment that were outside the scope of data that I needed.
             </p>
 
             <p className='mt-4'>
@@ -136,10 +135,9 @@ export default function Recipe() {
 
             <p>
               The vanilla JavaScript version parsed ingredient amounts out of formatted
-              strings using <code>split</code> and <code>parseFloat</code>. If the API
-              response format changed or a value was missing, the scaling logic could
-              silently return <code>NaN</code> and break calculations without obvious
-              errors.
+              strings using <code>split</code> and <code>parseFloat</code>. The problem is that if the API
+              response format changed or a value is missing, the scaling logic could
+              silently return <code>NaN</code> and break calculations without knowing where the error occurred.
             </p>
 
             <div className='bg-muted rounded-lg p-4 mt-4 overflow-x-auto'>
@@ -176,8 +174,11 @@ export default function Recipe() {
             </div>
 
             <p className='mt-4'>
-              Typing the API contracts up front made the scaling logic easier to reason
-              about and removed an entire category of parsing edge cases from the frontend.
+              Typing the API contracts up front made the scaling logic easier to reason about,
+              but the benefits extended across the entire application. Working with explicit
+              types for recipes, ingredients, instructions, and API responses made refactoring
+              safer, reduced runtime debugging caused by unexpected data shapes, and made the
+              frontend and backend easier to evolve together over time.
             </p>
           </li>
           <li>
@@ -206,34 +207,76 @@ export default function Recipe() {
         </ul>
       </CaseStudySection>
 
-      <CaseStudySection id='differently' title='Differently'>
-        <ul>
+      <CaseStudySection id='differently' title="What I'd change if I started over today">
+        <ul className='space-y-6 text-muted-foreground leading-7 max-w-2xl'>
+
           <li>
             <strong className='text-foreground'>
-              Using Mock Data for testing while developing in many points of working on my application
-              I burned all of spoonaculars data making fetch calls there what i would change again is create some Mock
-              recipes instead of using the real API.
+              Use mock data earlier during development
             </strong>
+
+            <p>
+              Spoonacular uses a quota-based API, and during development I frequently
+              burned through requests while testing fetch logic and UI updates. If I
+              rebuilt the project today, I would create mock recipe data earlier so
+              frontend development could continue without relying entirely on live API
+              requests.
+            </p>
           </li>
+
           <li>
             <strong className='text-foreground'>
-              I would implement abort controllers from the beginning especially for a quota based API
+              Implement request cancellation earlier
             </strong>
+
+            <p>
+              AbortController was added later in development, but introducing request
+              cancellation earlier would have reduced unnecessary API calls and made
+              the search experience more efficient for a quota-based API.
+            </p>
           </li>
+
           <li>
             <strong className='text-foreground'>
-              I would create a design token system to define consistent UI components and styles across the project.
-              The issue i did was re create different buttons for each component, leading to inconsistent
-              styling.
+              Create a more consistent component system
             </strong>
+
+            <p>
+              Earlier versions of the project duplicated button styles and UI patterns
+              across multiple components. If I started over today, I would define a
+              clearer design token system and reusable UI components much earlier to
+              keep the interface more consistent.
+            </p>
           </li>
+
           <li>
             <strong className='text-foreground'>
-              For working on projects that grow in complexity, I would implement a stronger folder structure to make
-              my workflow more efficient.
+              Improve project organization earlier
             </strong>
+
+            <p>
+              As the application grew, folder structure and organization became more
+              important for maintainability. I would spend more time defining a clearer
+              project structure earlier instead of reorganizing incrementally as the
+              codebase expanded.
+            </p>
           </li>
         </ul>
+      </CaseStudySection>
+
+      <CaseStudySection id='future' title='Future work and improvements'>
+        <p className='text-muted-foreground leading-7 max-w-2xl'>
+          One feature I would still like to add is the ability to save liked recipes
+          locally so users can revisit meals without searching again. For the current
+          scope of the project, localStorage would likely be enough before introducing
+          a larger authentication and database system.
+        </p>
+
+        <p className='text-muted-foreground leading-7 max-w-2xl mt-4'>
+          I would also like to spend more time adding tests around ingredient scaling
+          and API transformation utilities. Those parts of the application contain the
+          most reusable business logic and would benefit the most from testing.
+        </p>
       </CaseStudySection>
 
     </div>

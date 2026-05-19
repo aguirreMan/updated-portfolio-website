@@ -6,6 +6,8 @@ import Contact from './components/pages/Contact.jsx'
 import NotFound from './components/pages/NotFound.jsx'
 import CaseStudyLayout from './components/case-study/CaseStudyLayout.jsx'
 import Recipe from './components/pages/case-studies/Recipe.jsx'
+import Portfolio from './components/pages/case-studies/Portfolio.jsx'
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 function App() {
@@ -19,6 +21,9 @@ function App() {
           {/*Case Study Routes */}
           <Route path="projects/recipe-study" element={<CaseStudyLayout key='recipe-study' />}>
             <Route index element={<Recipe />} />
+          </Route>
+          <Route path="projects/portfolio-evolution" element={<CaseStudyLayout key='portfolio-evolution' />}>
+            <Route index element={<Portfolio />} />
           </Route>
 
           <Route path="contact" element={<Contact />} />
