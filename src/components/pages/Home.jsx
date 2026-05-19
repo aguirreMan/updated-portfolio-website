@@ -35,8 +35,8 @@ export default function Home() {
         <p className="text-white/70 text-xl mt-4 font-medium pb-6 tracking-wide max-w-xl">
           Building scalable, polished web applications with React, TypeScript, and modern tooling.
         </p>
-        <Link to="/contact">
-          <Button size="lg">Let’s talk frontend, AI & product engineering</Button>
+        <Link to="/projects">
+          <Button size="lg">View my work</Button>
         </Link>
       </div>
     </div>

@@ -50,8 +50,8 @@ export default function Recipe() {
 
       <CaseStudySection id='evolution' title='Refactors'>
         <p className='text-muted-foreground leading-7 max-w-2xl'>
-          The second version of the project also used vanilla JavaScript but this time i integrated the
-          Spoonacular API and spoonacular solved the problem of having an abundance of recipe data.
+          The second version of the project also used vanilla JavaScript but this time I integrated the
+          Spoonacular API to solve the problem of not having an abundance of recipe data.
         </p>
 
         <p className='text-muted-foreground leading-7 max-w-2xl mt-4'>

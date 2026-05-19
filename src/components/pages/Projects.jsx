@@ -1,4 +1,7 @@
 import ProjectCard from '../page-components/ProjectCard'
+import { Link } from 'react-router-dom'
+import { Button } from '../ui/button'
+
 
 const projectData = [
   {
@@ -48,6 +51,11 @@ export default function Projects() {
           {projectData.map((project) => (
             <ProjectCard key={project.title} {...project} />
           ))}
+        </div>
+        <div className='flex justify-center pt-14'>
+          <Link to="/contact">
+            <Button variant='secondary' size='lg'>Let's get in touch!</Button>
+          </Link>
         </div>
       </div>
     </div>

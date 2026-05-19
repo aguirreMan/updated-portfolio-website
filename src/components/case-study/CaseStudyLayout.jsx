@@ -26,7 +26,7 @@ export default function CaseStudyLayout() {
         .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
       if (visible[0]) setActiveSection(visible[0].target.id)
     },
-      { rootMargin: '-40% 0px -55% 0px', threshold: 0 }
+      { threshold: 0.15 }
     )
 
     sections.forEach(({ id }) => {

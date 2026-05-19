@@ -5,7 +5,6 @@ import CaseStudySection from '@/components/case-study/CaseStudySection'
 
 const stack = ['React', 'React Router', 'Tailwind CSS', 'Shadcn UI', 'Framer Motion', 'Netlify']
 
-
 export default function Portfolio() {
   return (
     <div className='flex flex-col gap-14'>
@@ -29,31 +28,41 @@ export default function Portfolio() {
 
       <CaseStudySection title='origin' description='Why I rebuilt it'>
         <p className='text-muted-foreground leading-7 max-w-2xl'>
-          The original version of my portfolio was built during college and primarily
-          focused on listing technologies and presenting projects with limited depth.
-          As I gained more experience building applications, I realized that portfolios
-          are more effective when they communicate engineering decisions, technical
-          tradeoffs, and project evolution rather than simply acting as technology showcases.
-          This redesign was created to better reflect that shift in thinking.
+          The original version of my portfolio was built during college and was heavily
+          shaped by the constraints of college. The focus at the time was learning
+          core frontend fundamentals, completing projects within the given timelines, and
+          shipping a functional website.
+        </p>
+
+        <p className='text-muted-foreground leading-7 max-w-2xl mt-6'>
+          One of the biggest lessons I learned during that process was the importance of
+          building an MVP first before expanding scope. Rather than attempting to overbuild
+          projects early on, the priority was creating working solutions that could be shipped and later
+          be iterated upon.
+        </p>
+
+        <p className='text-muted-foreground leading-7 max-w-2xl mt-6'>
+          As I gained more experience building applications outside of school, my thinking
+          and problem solving skills began improving.  These skills were then applied to the portfolio project,
+          allowing me to build a portfolio that not only showcases my technical skills but also
+          communicates my problem-solving approach and project evolution.
         </p>
       </CaseStudySection>
 
       <CaseStudySection title='evolution' description='How the project evolved'>
         <p className='text-muted-foreground leading-7 max-w-2xl'>
-          While the original portfolio also used a multi-page structure, this rebuild
-          focused on improving scalability, consistency, and project storytelling.
-          Reusable layouts and shared UI components were introduced to create a more
-          maintainable architecture, while long-form case studies replaced shorter
-          project summaries to better communicate engineering decisions and technical
-          tradeoffs.
+          While the original portfolio already used a multi-page structure, this rebuild
+          focused on improving scalability, consistency, and long-term maintainability.
+          Reusable layouts and shared UI components were introduced to reduce duplication
+          and create a more structured architecture as the amount of content continued to grow.
         </p>
 
-        <p className='text-muted-foreground leading-7 max-w-2xl mt-6'>
-          The transition to Tailwind CSS streamlined responsive styling and improved
-          development workflow compared to maintaining larger standalone CSS files.
-          While utility-first styling introduced longer className patterns, it also
-          made iteration and component-level styling significantly easier to manage
-          across the application.
+         <p className='text-muted-foreground leading-7 max-w-2xl mt-6'>
+          The project also evolved from shorter project summaries into long-form case studies
+          focused on documenting technical decisions, tradeoffs, and architectural reasoning.
+          Instead of treating projects as static showcases, the portfolio was redesigned to
+          better reflect the iterative nature of software development and how applications
+          evolve over time.
         </p>
       </CaseStudySection>
 
@@ -78,37 +87,32 @@ export default function Portfolio() {
 
       <CaseStudySection title='decisions' description='The decisions I made during development'>
         <ul className='space-y-4 text-muted-foreground leading-7 max-w-2xl'>
+
           <li>
-            <strong>React Router:</strong> Introduced dedicated routes and nested layouts
-            to improve scalability, navigation, and future expansion of case studies.
+            <strong>Route-Driven Architecture:</strong> As the portfolio evolved into
+            larger case studies with more structured content, navigation built around
+            dedicated routes and nested layouts became easier to scale and maintain than
+            relying on component state and conditional rendering.
           </li>
 
           <li>
-            <strong>Tailwind CSS:</strong> Simplified responsive styling and improved
-            development workflow compared to maintaining larger standalone CSS files.
+            <strong>Reusable UI Patterns:</strong> Shared layouts, reusable components,
+            and UI primitives were introduced to reduce duplication and maintain visual
+            consistency as the application continued to grow.
           </li>
 
           <li>
-            <strong>shadcn/ui:</strong> Provided reusable UI primitives that could be
-            extended and customized while keeping the design system consistent.
+            <strong>Tailwind CSS:</strong> Utility-first styling improved iteration speed
+            and simplified responsive development compared to maintaining larger standalone
+            CSS files across multiple pages and layouts.
           </li>
 
           <li>
-            <strong>Framer Motion:</strong> Added subtle animations and transitions to
-            improve polish without overwhelming the content of the portfolio.
+            <strong>Framer Motion:</strong> Motion was used selectively to improve visual
+            polish and user experience without distracting from the technical content and
+            case studies themselves.
           </li>
 
-          <li>
-            <strong>Navigation Architecture:</strong> Navigation was rebuilt around
-            reusable route-driven components to improve scalability, consistency,
-            and responsive behavior across the application.
-          </li>
-
-          <li>
-            <strong>Reusable Component Architecture:</strong> Shared layouts,
-            navigation components, and reusable UI patterns were introduced to
-            improve consistency and simplify future expansion of the portfolio.
-          </li>
         </ul>
       </CaseStudySection>
 
