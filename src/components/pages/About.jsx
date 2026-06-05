@@ -107,7 +107,7 @@ export default function About() {
             </p>
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <MapPin size={13} />
-              Iowa → Los Angeles, CA
+              Iowa → Open to relocation
             </div>
           </CardContent>
         </Card>

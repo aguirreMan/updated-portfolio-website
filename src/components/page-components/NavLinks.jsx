@@ -6,7 +6,7 @@ const links = [
   { label: 'About', to: '/about' },
   { label: 'Projects', to: '/projects' },
   { label: 'Contact', to: '/contact' },
-  { label: 'Resume', to: '/assets/Manuel_Aguirre_Frontend_Engineer.pdf', external: true },
+  { label: 'Resume', to: '/assets/Manuel_Aguirre_Resume.pdf', external: true },
 ]
 
 export default function NavLinks({ isMobile = false, onLinkClick }) {

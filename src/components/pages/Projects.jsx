@@ -6,8 +6,8 @@ import { Button } from '../ui/button'
 const projectData = [
   {
     title: 'Gorilla AI',
-    description:
-      'AI-powered learning accelerator — conversational, adaptive to skill level, and scoped to research and learning workflows. Built with full auth, rate limiting, and chat persistence.',
+    isFeatured: true,
+    description: 'AI-powered learning accelerator conversational, adaptive to skill level, and scoped to research and learning workflows. Built with full auth, rate limiting, and chat persistence.',
     stack: ['Next.js', 'React', 'TypeScript', 'Tailwind', 'shadcn/ui', 'TanStack Query', 'Clerk', 'Supabase', 'Vercel'],
     liveLink: 'https://gorilla-ai-theta.vercel.app/',
     githubLink: 'https://github.com/aguirreMan/gorilla-ai',
@@ -49,7 +49,9 @@ export default function Projects() {
         </div>
         <div className="grid md:grid-cols-3 gap-8">
           {projectData.map((project) => (
-            <ProjectCard key={project.title} {...project} />
+            <ProjectCard key={project.title}
+              className={project.isFeatured ? 'md:col-span-3' : 'md:col-span-1'}
+              {...project} />
           ))}
         </div>
         <div className='flex justify-center pt-14'>

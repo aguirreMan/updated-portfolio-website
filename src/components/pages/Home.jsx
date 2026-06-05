@@ -21,14 +21,14 @@ export default function Home() {
           Frontend Engineer
         </motion.p>
         <h1 className="text-4xl md:text-6xl font-bold text-white tracking-wider drop-shadow-md">
-          {name.split('').map((char, index) => (
+          {name.split('').map((character, index) => (
             <motion.span
               key={index}
               initial={{ opacity: 0, x: -16 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: index * 0.07 }}
             >
-              {char}
+              {character}
             </motion.span>
           ))}
         </h1>

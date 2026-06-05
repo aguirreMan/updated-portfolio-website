@@ -7,6 +7,7 @@ import NotFound from './components/pages/NotFound.jsx'
 import CaseStudyLayout from './components/case-study/CaseStudyLayout.jsx'
 import Recipe from './components/pages/case-studies/Recipe.jsx'
 import Portfolio from './components/pages/case-studies/Portfolio.jsx'
+import Gorilla from './components/pages/case-studies/Gorilla.jsx'
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
@@ -24,6 +25,9 @@ function App() {
           </Route>
           <Route path="projects/portfolio-evolution" element={<CaseStudyLayout key='portfolio-evolution' />}>
             <Route index element={<Portfolio />} />
+          </Route>
+          <Route path="projects/gorilla-ai" element={<CaseStudyLayout key='gorilla-ai' />}>
+            <Route index element={<Gorilla />} />
           </Route>
 
           <Route path="contact" element={<Contact />} />
