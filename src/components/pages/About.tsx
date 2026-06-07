@@ -11,7 +11,7 @@ const infraSkills = [
   'Vercel', 'Netlify', 'Railway', 'Postman',
 ]
 
-function Badge({ children }) {
+function Badge({ children }: { children: React.ReactNode }) {
   return (
     <span className="text-xs px-2.5 py-1 rounded-md border border-border bg-muted text-muted-foreground">
       {children}
@@ -103,7 +103,7 @@ export default function About() {
             <p className="text-sm text-muted-foreground leading-relaxed mb-3">
               Seeking a collaborative frontend role where I can contribute
               immediately and keep growing. Currently based in Iowa and
-              targeting opportunities in the LA area — open to relocation.
+              targeting opportunities outside of Iowa.
             </p>
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <MapPin size={13} />

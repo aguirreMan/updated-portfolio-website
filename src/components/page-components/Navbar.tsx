@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import NavLinks from '../page-components/NavLinks'
+import NavLinks from './NavLinks'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import { IoMdClose } from 'react-icons/io'
 import { Link } from 'react-router-dom'
@@ -9,7 +9,7 @@ export default function Navbar() {
 
   useEffect(() => {
     if (!isOpen) return
-    const handleKey = (e) => { if (e.key === 'Escape') setIsOpen(false) }
+    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setIsOpen(false) }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
   }, [isOpen])

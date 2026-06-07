@@ -1,5 +1,3 @@
-import { ExternalLink, Github } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 import CaseStudyHeader from '@/components/case-study/CaseStudyHeader'
 import CaseStudySection from '@/components/case-study/CaseStudySection'
 

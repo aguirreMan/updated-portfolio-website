@@ -5,7 +5,26 @@ import { Link } from 'react-router-dom'
 import { ExternalLink } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-export default function ProjectCard({ className, title, description, stack, liveLink, githubLink, blogSlug, isFeatured }) {
+interface ProjectCardProps {
+  className?: string
+  title: string
+  description: string
+  stack: string[]
+  liveLink: string
+  githubLink: string
+  blogSlug?: string
+  isFeatured?: boolean
+}
+
+export default function ProjectCard({
+    className,
+    title,
+    description,
+    stack,
+    liveLink,
+    githubLink,
+    blogSlug,
+    isFeatured, }: ProjectCardProps) {
   return (
     <Card className={cn('flex flex-col hover:-translate-y-1 transition-all duration-200',
       isFeatured ? "border-primary/40 bg-primary/[0.02] shadow-md" : "", className)}>

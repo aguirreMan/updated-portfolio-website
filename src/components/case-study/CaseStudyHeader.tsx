@@ -1,7 +1,16 @@
 import { ExternalLink, Github } from 'lucide-react'
 import { Badge } from '../ui/badge'
 
-export default function CaseStudyHeader({ category, title, description, stack, liveLink, githubLink }) {
+interface CaseStudyHeaderProps {
+  category: string
+  title: string
+  description: string
+  stack: string[]
+  liveLink: string
+  githubLink: string
+}
+
+export default function CaseStudyHeader({ category, title, description, stack, liveLink, githubLink }: CaseStudyHeaderProps) {
   return (
     <header className='pb-8 border-b border-border'>
       <p className='text-sm text-muted-foreground mb-4'>{category}</p>

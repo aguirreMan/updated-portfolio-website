@@ -9,7 +9,12 @@ const links = [
   { label: 'Resume', to: '/assets/Updated_Manuel_Aguirre_Resume.pdf', external: true },
 ]
 
-export default function NavLinks({ isMobile = false, onLinkClick }) {
+interface NavLinksProps {
+  isMobile?: boolean
+  onLinkClick?: () => void
+}
+
+export default function NavLinks({ isMobile = false, onLinkClick }: NavLinksProps) {
   function closeMobileMenu() {
     if (isMobile && onLinkClick) {
       onLinkClick()

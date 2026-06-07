@@ -1,13 +1,12 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
     "jsx": "react-jsx",
     "allowJs": true,
-    "checkJs": false,
-    "strict": false,
+    "checkJs": true,
+    "strict": true,
     "noEmit": true,
     "module": "esnext",
     "moduleResolution": "bundler",

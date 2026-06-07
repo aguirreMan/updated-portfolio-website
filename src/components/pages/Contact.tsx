@@ -6,12 +6,18 @@ import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
 import { Button } from '../ui/button'
 
+interface FormFields {
+  name: string
+  email: string
+  message: string
+}
+
 export default function Contact() {
   const [formSubmit, setFormSubmit] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-  const [formFields, setFormFields] = useState({ name: '', email: '', message: '' })
-  const [errorForm, setErrorForm] = useState(null)
-  const abortRef = useRef(null)
+  const [formFields, setFormFields] = useState<FormFields>({ name: '', email: '', message: '' })
+  const [errorForm, setErrorForm] = useState<string | null>(null)
+  const abortRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
     return () => {
@@ -19,11 +25,11 @@ export default function Contact() {
     }
   }, [])
 
-  function formChange(event) {
+  function formChange(event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) {
     setFormFields(prev => ({ ...prev, [event.target.name]: event.target.value}))
   }
 
-  function encode(data) {
+  function encode(data: Record<string, string>) {
     return Object.keys(data)
       .map(
         (key) =>
@@ -34,7 +40,7 @@ export default function Contact() {
         .join('&')
   }
 
-  async function submitForm(event) {
+  async function submitForm(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setErrorForm(null)
     setSubmitting(true)
@@ -53,8 +59,9 @@ export default function Contact() {
       if (!response.ok) throw new Error('Failed to submit form')
       setFormSubmit(true)
     } catch (error) {
-      if (error.name === 'AbortError') return
+      if (error instanceof Error && error.name === 'AbortError') return
       setErrorForm('Something went wrong. Please try again or email me directly.')
+    } finally {
       setSubmitting(false)
     }
   }

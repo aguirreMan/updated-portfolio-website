@@ -1,5 +1,3 @@
-import { ExternalLink, Github } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 import CaseStudyHeader from '@/components/case-study/CaseStudyHeader'
 import CaseStudySection from '@/components/case-study/CaseStudySection'
 
@@ -17,7 +15,11 @@ export default function Portfolio() {
         liveLink='https://manuelaguirre.dev/'
       />
 
-      <CaseStudySection title='overview' description='An updated portfolio website'>
+      <CaseStudySection
+        id='overview'
+        title='Overview'
+        description='A multi-page developer portfolio built around long-form case studies and reusable UI architecture.'
+      >
         <p className='text-muted-foreground leading-7 max-w-2xl'>
           A multi-page developer portfolio thatfocuses on long-form project case studies,
           reusable UI patterns, and scalable
@@ -26,7 +28,11 @@ export default function Portfolio() {
         </p>
       </CaseStudySection>
 
-      <CaseStudySection title='origin' description='Why I rebuilt it'>
+      <CaseStudySection
+        id='origin'
+        title='How it started'
+        description='The first version was built in college under tight constraints. This is why I rebuilt it.'
+      >
         <p className='text-muted-foreground leading-7 max-w-2xl'>
           The original version of my portfolio was built during college and was heavily
           shaped by the constraints of college. The focus at the time was learning
@@ -49,7 +55,11 @@ export default function Portfolio() {
         </p>
       </CaseStudySection>
 
-      <CaseStudySection title='evolution' description='How the project evolved'>
+      <CaseStudySection
+        id='evolution'
+        title='How the project evolved'
+        description='From short project summaries to long-form case studies and a more scalable architecture.'
+      >
         <p className='text-muted-foreground leading-7 max-w-2xl'>
           While the original portfolio already used a multi-page structure, this rebuild
           focused on improving scalability, consistency, and long-term maintainability.
@@ -66,7 +76,11 @@ export default function Portfolio() {
         </p>
       </CaseStudySection>
 
-      <CaseStudySection title='challenges' description='The challenges I faced during development'>
+      <CaseStudySection
+        id='challenges'
+        title='Challenges encountered'
+        description='Scaling navigation and balancing visual polish with readable, structured content.'
+      >
         <p className='text-muted-foreground leading-7 max-w-2xl'>
           One of the main architectural limitations in the original portfolio was
           handling navigation through component state and conditional rendering
@@ -85,7 +99,11 @@ export default function Portfolio() {
         </p>
       </CaseStudySection>
 
-      <CaseStudySection title='decisions' description='The decisions I made during development'>
+      <CaseStudySection
+        id='decisions'
+        title='Technical decisions'
+        description='Every major technical choice had a specific reason behind it.'
+      >
         <ul className='space-y-4 text-muted-foreground leading-7 max-w-2xl'>
 
           <li>
@@ -116,7 +134,11 @@ export default function Portfolio() {
         </ul>
       </CaseStudySection>
 
-      <CaseStudySection title='differently' description='What I would change if I rebuilt the project today'>
+      <CaseStudySection
+        id='differently'
+        title="What I'd change if I started over today"
+        description='Lessons on content, structure, and design systems I would apply from day one.'
+      >
         <p className='text-muted-foreground leading-7 max-w-2xl'>
           If I rebuilt the portfolio today, I would place even greater emphasis on
           content and technical storytelling rather than focusing too heavily on
@@ -134,7 +156,11 @@ export default function Portfolio() {
         </p>
       </CaseStudySection>
 
-      <CaseStudySection title='future' description='Future improvements and expansion'>
+      <CaseStudySection
+        id='future'
+        title='Future work and improvements'
+        description='Where the portfolio goes next.'
+      >
         <p className='text-muted-foreground leading-7 max-w-2xl'>
           Future iterations of the portfolio will continue focusing on deeper project
           documentation, engineering case studies, and improving the overall user
