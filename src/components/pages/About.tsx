@@ -1,5 +1,5 @@
 import { GraduationCap, Code2, Briefcase, MapPin } from 'lucide-react'
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 
 const frontendSkills = [
   'React', 'TypeScript', 'Next.js', 'React Router',

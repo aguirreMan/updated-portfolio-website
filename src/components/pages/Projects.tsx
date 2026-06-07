@@ -1,6 +1,6 @@
-import ProjectCard from '../page-components/ProjectCard'
+import ProjectCard from '@/components/page-components/ProjectCard'
 import { Link } from 'react-router-dom'
-import { Button } from '../ui/button'
+import { Button } from '@/components/ui/button'
 
 
 const projectData = [
