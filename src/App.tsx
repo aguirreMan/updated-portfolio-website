@@ -8,12 +8,14 @@ import CaseStudyLayout from '@/components/case-study/CaseStudyLayout'
 import Recipe from '@/components/pages/case-studies/Recipe'
 import Portfolio from '@/components/pages/case-studies/Portfolio'
 import Gorilla from '@/components/pages/case-studies/Gorilla'
+import GoogleAnalyticsTracker from '@/components/page-components/GoogleAnalyticsTracker'
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 function App() {
   return (
     <BrowserRouter>
+      <GoogleAnalyticsTracker />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
