@@ -19,8 +19,7 @@ export default function Navbar() {
       <nav className="w-full absolute top-0 left-0 flex justify-between items-center px-6 py-4 z-20">
         <Link
           to="/"
-          className="text-lg font-semibold tracking-wide text-foreground
-                     transition-colors hover:text-primary"
+          className="text-lg font-semibold tracking-wide text-foreground transition-colors hover:text-primary"
         >
           MA
         </Link>

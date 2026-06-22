@@ -36,7 +36,7 @@ export default function Home() {
           Building scalable, polished web applications with React, TypeScript, and modern tooling.
         </p>
         <Link to="/projects">
-          <Button size="lg">View my work</Button>
+          <Button size="lg">View Projects</Button>
         </Link>
       </div>
     </div>
