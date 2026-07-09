@@ -31,13 +31,7 @@ export default function Contact() {
 
   function encode(data: Record<string, string>) {
     return Object.keys(data)
-      .map(
-        (key) =>
-          encodeURIComponent(key) +
-            '=' +
-          encodeURIComponent(data[key])
-        )
-        .join('&')
+      .map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(data[key])).join('&')
   }
 
   async function submitForm(event: React.FormEvent<HTMLFormElement>) {
