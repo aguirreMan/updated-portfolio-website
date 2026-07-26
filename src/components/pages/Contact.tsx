@@ -74,7 +74,7 @@ export default function Contact() {
 
   return (
     <div
-      className="flex flex-col items-center min-h-screen px-6 md:px-24 justify-center bg-background">
+      className="flex flex-col min-h-screen items-center px-6 md:px-24 justify-center bg-background">
       <h1 className="flex flex-row gap-2 text-4xl text-foreground">
         Let's grab a cup of{' '}
         <Coffee className="w-10 h-10 text-amber-950" strokeWidth={2.5} />

@@ -38,10 +38,9 @@ const projectData = [
 
 export default function Projects() {
   return (
-    <div className="min-h-screen px-6 py-20">
+    <div className="px-6 py-20">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Work</p>
           <h1 className="mb-4 text-4xl font-bold text-foreground">Projects</h1>
           <p className="mx-auto max-w-2xl text-muted-foreground">
             A selection of projects demonstrating my experience building modern, scalable web applications.

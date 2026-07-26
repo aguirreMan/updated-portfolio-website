@@ -21,14 +21,11 @@ function Badge({ children }: { children: React.ReactNode }) {
 
 export default function About() {
   return (
-    <div className="min-h-screen py-20 px-6">
+    <div className="py-20 px-6">
       <div className="max-w-4xl mx-auto">
 
         {/* Hero */}
         <div className="text-center mb-12 pb-10 border-b border-border">
-          <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
-            About me
-          </p>
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
             Frontend engineer focused on React & TypeScript
           </h1>

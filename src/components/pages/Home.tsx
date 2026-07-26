@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 export default function Home() {
   const name = 'Manuel Aguirre'
   return (
-    <div className="relative min-h-screen w-full overflow-hidden">
+    <div className="relative w-full overflow-hidden">
       <img
         src="/assets/hero.png"
         alt=""
