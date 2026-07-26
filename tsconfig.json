@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["node"],
     "paths": {
       "@/*": ["./src/*"]
     },
@@ -13,5 +14,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    ".storybook",
+    "vite.config.ts"
+  ]
 }
