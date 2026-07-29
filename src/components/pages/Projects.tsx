@@ -33,7 +33,17 @@ const projectData = [
     liveLink: 'https://manuelaguirre.dev/',
     githubLink: 'https://github.com/aguirreMan/updated-portfolio-website',
     blogSlug: 'portfolio-evolution',
-  }
+  },
+  {
+    title: 'Dragon Ball Z',
+    description: `
+      Interactive React application featuring reducer-driven game logic, reusable UI components, animations, and custom power-level visualizations inspired by the Dragon Ball universe.
+    `,
+    stack: ['React', 'TypeScript', 'React Router', 'Tailwind CSS', 'Framer Motion', 'Radix UI', 'Netlify'],
+    liveLink: 'https://relaxed-meerkat-4ede1d.netlify.app/',
+    githubLink: 'https://github.com/aguirreMan/dragonball-z-react-application',
+    blogSlug: 'dragon-ballz',
+  },
 ]
 
 export default function Projects() {
@@ -46,10 +56,10 @@ export default function Projects() {
             A selection of projects demonstrating my experience building modern, scalable web applications.
           </p>
         </div>
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 gap-8">
           {projectData.map((project) => (
             <ProjectCard key={project.title}
-              className={project.isFeatured ? 'md:col-span-3' : 'md:col-span-1'}
+              className={project.isFeatured ? 'md:col-span-1' : 'md:col-span-1'}
               {...project} />
           ))}
         </div>

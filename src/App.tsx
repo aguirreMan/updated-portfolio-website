@@ -8,6 +8,7 @@ import CaseStudyLayout from '@/components/case-study/CaseStudyLayout'
 import Recipe from '@/components/pages/case-studies/Recipe'
 import Portfolio from '@/components/pages/case-studies/Portfolio'
 import Gorilla from '@/components/pages/case-studies/Gorilla'
+import DragonBallz from '@/components/pages/case-studies/DragonBallz'
 import GoogleAnalyticsTracker from '@/components/page-components/GoogleAnalyticsTracker'
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
@@ -30,6 +31,9 @@ function App() {
           </Route>
           <Route path="projects/gorilla-ai" element={<CaseStudyLayout key='gorilla-ai' />}>
             <Route index element={<Gorilla />} />
+          </Route>
+          <Route path="projects/dragon-ballz" element={<CaseStudyLayout key='DragonBallz-study' />}>
+            <Route index element={<DragonBallz />} />
           </Route>
 
           <Route path="contact" element={<Contact />} />
