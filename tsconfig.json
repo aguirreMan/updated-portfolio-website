@@ -18,6 +18,7 @@
     "src",
     ".storybook",
     "vite.config.ts",
-    "declarations.d.ts"
+    "declarations.d.ts",
+    "mdx.d.ts"
   ]
 }
