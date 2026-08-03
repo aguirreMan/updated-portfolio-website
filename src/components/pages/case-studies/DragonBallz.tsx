@@ -6,9 +6,9 @@ export default function DragonBallZ() {
   return (
     <div className='flex flex-col gap-14'>
       <CaseStudyHeader
-        category='Frontend Weirdness'
+        projectType='Frontend Weirdness'
         title='Dragon Ball Z'
-        description='A React app for exploring the Dragon Ball Z universe — characters, planets, and transformations, built as a playground for animation and state management.'
+        summary='A React app for exploring the Dragon Ball Z universe — characters, planets, and transformations, built as a playground for animation and state management.'
         stack={stack}
         githubLink='https://github.com/aguirreMan/dragonball-z-react-application'
         liveLink='https://relaxed-meerkat-4ede1d.netlify.app/'

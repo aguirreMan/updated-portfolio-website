@@ -10,9 +10,9 @@ export default function Recipe() {
   return (
     <div className='flex flex-col gap-14'>
       <CaseStudyHeader
-        category='Full Stack Application'
+        projectType='Full Stack Application'
         title='Recipe App'
-        description='Recipe discovery app using React, Express, and Spoonacular'
+        summary='Recipe discovery app using React, Express, and Spoonacular'
         stack={stack}
         githubLink='https://github.com/aguirreMan/react-recipe'
         liveLink='https://react-recipe-blush.vercel.app/'

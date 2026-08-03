@@ -1,0 +1,120 @@
+import CaseStudyHeader from '@/components/case-study/CaseStudyHeader'
+import CaseStudySection from '@/components/case-study/CaseStudySection'
+
+<CaseStudyHeader
+  projectType="Full Stack Application"
+  title="Recipe App"
+  summary="Recipe discovery app using React, Express, and Spoonacular."
+  stack={[
+    'React',
+    'TypeScript',
+    'React Router',
+    'Node.js',
+    'Express',
+    'Tailwind CSS',
+    'Vercel',
+    'Railway',
+  ]}
+  githubLink="https://github.com/aguirreMan/react-recipe"
+  liveLink="https://react-recipe-blush.vercel.app/"
+/>
+
+<CaseStudySection
+  id="overview"
+  title="Overview"
+>
+
+Recipe discovery application built with React and TypeScript using the
+Spoonacular API for recipe search, category filtering, and ingredient
+scaling.
+
+The project evolved from a simple college assignment into a full-stack
+application featuring an Express proxy server, SQLite caching, and a more
+maintainable frontend architecture.
+
+</CaseStudySection>
+
+<CaseStudySection
+  id="origin"
+  title="Project Evolution"
+>
+
+The project originally began as a community college assignment using
+hardcoded recipe data.
+
+After graduation I revisited the project and rebuilt it around the
+Spoonacular API so recipes could be searched dynamically instead of being
+maintained manually.
+
+Over time the project went through several rewrites as I learned more about
+React, TypeScript, routing, backend development, and frontend architecture.
+
+</CaseStudySection>
+
+<CaseStudySection
+  id="technical-decisions"
+  title="Technical Decisions"
+>
+
+One major improvement was replacing fragile string parsing with strongly
+typed data models.
+
+The original implementation extracted ingredient amounts from formatted
+strings.
+
+```tsx title="Original implementation"
+const parts = currentDataString
+  .split(':')[1]
+  .trim()
+  .split(' ')
+
+const originalAmount = parseFloat(parts[0])
+```
+
+After migrating to TypeScript, ingredient measurements became explicit
+objects instead of parsed strings.
+
+```tsx title="MeasureUnit.ts"
+export interface MeasureUnit {
+  amount: number
+  unitShort: string
+}
+```
+
+The scaling logic then became straightforward arithmetic.
+
+```tsx title="scaleServings.ts"
+const scaledAmountUS =
+  ingredient.measures.us.amount * scaleFormula
+```
+
+Using typed API contracts made refactoring safer and reduced runtime bugs
+caused by unexpected response shapes.
+
+</CaseStudySection>
+
+<CaseStudySection
+  id="challenges"
+  title="Challenges Encountered"
+>
+
+- Moving from a frontend-only project to an Express backend.
+- Learning React Router and replacing modal-based navigation.
+- Deploying independent frontend and backend services.
+- Managing API quotas while developing against Spoonacular.
+
+</CaseStudySection>
+
+<CaseStudySection
+  id="future"
+  title="Future Improvements"
+>
+
+Some improvements I'd still like to make include:
+
+- Saving favorite recipes.
+- Expanding automated testing.
+- Continuing to refine the component architecture.
+- Improving offline support.
+
+</CaseStudySection>

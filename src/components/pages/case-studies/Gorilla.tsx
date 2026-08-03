@@ -7,9 +7,9 @@ export default function Gorilla() {
   return (
     <div className='flex flex-col gap-14'>
       <CaseStudyHeader
-        category='Frontend Architecture'
+        projectType='Frontend Architecture'
         title='Gorilla AI'
-        description='An agentic AI tool that accelerates how users learn technical topics'
+        summary='An agentic AI tool that accelerates how users learn technical topics'
         stack={stack}
         githubLink='https://github.com/aguirreMan/gorilla-ai'
         liveLink='https://gorilla-ai-theta.vercel.app/'

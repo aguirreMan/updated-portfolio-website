@@ -7,9 +7,9 @@ export default function Portfolio() {
   return (
     <div className='flex flex-col gap-14'>
       <CaseStudyHeader
-        category='Frontend Architecture'
+        projectType='Frontend Architecture'
         title='Portfolio website'
-        description='Multi-page developer portfolio focused on long-form case studies, reusable UI architecture, and documenting project evolution through engineering decisions and technical tradeoffs.'
+        summary='Multi-page developer portfolio focused on long-form case studies, reusable UI architecture, and documenting project evolution through engineering decisions and technical tradeoffs.'
         stack={stack}
         githubLink='https://github.com/aguirreMan/updated-portfolio-website'
         liveLink='https://manuelaguirre.dev/'
