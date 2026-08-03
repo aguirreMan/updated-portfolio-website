@@ -1,0 +1,71 @@
+import CaseStudyHeader from '@/components/case-study/CaseStudyHeader'
+import CaseStudySection from '@/components/case-study/CaseStudySection'
+
+<CaseStudyHeader
+  projectType="Frontend Challenge"
+  title="Dragon Ball Z"
+  summary="A frontend challenge involving visualizing complex data and bringing the dragon ball z universe to life"
+  stack={[
+    'React',
+    'TypeScript',
+    'React Router',
+    'Tailwind CSS',
+    'radix-ui',
+    'framer-motion',
+    'Netlify',
+  ]}
+  githubLink="https://github.com/aguirreMan/dragonball-z-react-application"
+  liveLink="https://relaxed-meerkat-4ede1d.netlify.app/"
+/>
+
+
+<CaseStudySection
+  id="visualization"
+  title="Visualizing Power Levels"
+>
+
+Character power levels seem easy to visualize until the underlying data spans several orders of magnitude. The Dragon Ball API includes values ranging from the low thousands to numbers beyond JavaScript's safe integer range, along with unknown and googolplex-scale values.
+
+A traditional linear progress bar quickly became meaningless because almost every character appeared as 0% compared to the strongest fighters.
+
+To solve this, I parsed power levels into BigInt values and applied logarithmic scaling so the visualization remained useful across the entire roster. Supporting utilities also handled unknown and malformed values gracefully, allowing the UI to remain consistent regardless of the API response.
+</CaseStudySection>
+
+<CaseStudySection
+id="Arena-game"
+title="Managing Arena State"
+>
+As the Arena feature grew, what began as a handful of independent state variables became a connected workflow. Fighter selection, countdowns, battle phases, winner calculation, and resetting the arena all depended on one another.
+
+Coordinating those relationships with multiple useState hooks became increasingly difficult because each update affected several parts of the interface.
+
+I redesigned the feature around a reducer so state transitions were represented as explicit actions rather than scattered updates across the component.
+</CaseStudySection>
+
+<CaseStudySection
+  id="upset"
+  title="Adding randomness to a game"
+>
+
+The Arena feature wasn't intended to be a power level calculator where the strongest character always wins. If every matchup produced the same predictable result, the game quickly became repetitive because there was no reason to replay battles once the outcome was known.
+
+At the same time, making every battle completely random wouldn't reflect the differences between characters. Stronger fighters still needed a significant advantage while leaving room for occasional upsets.
+
+To balance those competing goals, I compared the fighters' power levels using the same logarithmic scaling used throughout the application. The resulting difference was then used to influence the probability of each fighter winning, allowing evenly matched battles to feel competitive while still making rare upsets possible.
+
+The Arena also exposes an isUpset flag whenever a lower-powered fighter wins. Besides making the result visible in the UI, it gave me a way to distinguish expected outcomes from genuinely surprising ones and made battles feel more memorable.
+
+</CaseStudySection>
+
+<CaseStudySection
+  id="reusable-components"
+  title="Building reusable UI components"
+>
+
+As the application expanded beyond browsing characters into interactive gameplay, many interface patterns began repeating throughout the project. Character cards, power visualizations, badges, dialogs, and arena controls all needed to present different data while maintaining a consistent user experience.
+
+Rather than duplicating those patterns across multiple pages, I extracted them into reusable components that could be shared throughout the application. Components such as the Arena Battle Modal, Character Power Progress, Affiliation Badge, and Fighter Slot became building blocks for new features instead of one-off implementations.
+
+Designing the project this way reduced duplication, kept the UI consistent, and made it easier to expand the application without rewriting the same interface patterns for every new screen.
+
+</CaseStudySection>

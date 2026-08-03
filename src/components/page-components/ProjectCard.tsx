@@ -27,22 +27,27 @@ export default function ProjectCard({
     isFeatured, }: ProjectCardProps) {
   return (
     <Card className={cn('flex flex-col hover:-translate-y-1 transition-all duration-200',
-      isFeatured ? "border-primary/40 bg-primary/[0.02] shadow-md" : "", className)}>
+      isFeatured ? "border-primary/40 bg-card shadow-lg" : "", className)}>
       <CardHeader>
         {isFeatured && (
-          <Badge className="text-xs uppercase tracking-widest mb-1">
+          <Badge className="text-xs uppercase tracking-widest mb-2">
             Flagship Project
           </Badge>
         )}
-        <CardTitle className="text-xl">{title}</CardTitle>
-        <p className="text-sm text-muted-foreground">{description}</p>
+        <CardTitle className={cn(
+          'text-xl',
+          isFeatured && 'text-2xl',
+        )}
+        >
+          {title}
+        </CardTitle>
+        <p className="text-sm leading-6 text-muted-foreground">{description}</p>
       </CardHeader>
       <CardContent className="flex flex-wrap gap-2">
         {stack.map((tech) => (
           <Badge
             key={tech}
             variant="secondary"
-            className={isFeatured ? "bg-primary/10 text-primary hover:bg-primary/20 border-transparent shadow-none" : ""}
           >
             {tech}
           </Badge>

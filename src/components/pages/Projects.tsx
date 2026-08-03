@@ -7,8 +7,8 @@ const projectData = [
   {
     title: 'Gorilla AI',
     isFeatured: true,
-    description: 'AI-powered learning accelerator conversational, adaptive to skill level, and scoped to research and learning workflows. Built with full auth, rate limiting, and chat persistence.',
-    stack: ['Next.js', 'React', 'TypeScript', 'Tailwind', 'shadcn/ui', 'TanStack Query', 'Clerk', 'Supabase', 'Vercel'],
+    description: 'AI-powered learning platform that adapts conversations to a user’s skill level while supporting authenticated chat sessions, persistent history, and structured learning workflows.',
+    stack: ['Next.js', 'React', 'TypeScript', 'Tailwind', 'shadcn/ui', 'Clerk', 'Supabase', 'Vercel'],
     liveLink: 'https://gorilla-ai-theta.vercel.app/',
     githubLink: 'https://github.com/aguirreMan/gorilla-ai',
     blogSlug: 'gorilla-ai',
@@ -21,18 +21,6 @@ const projectData = [
     liveLink: 'https://react-recipe-blush.vercel.app/',
     githubLink: 'https://github.com/aguirreMan/react-recipe',
     blogSlug: 'recipe-study',
-  },
-  {
-    title: 'Portfolio Website',
-    description: `
-      A multi-page developer portfolio focused on long-form case studies,
-      reusable UI architecture, and documenting the evolution of projects
-      through engineering decisions and technical tradeoffs.
-    `,
-    stack: ['React', 'React Router', 'Tailwind CSS', 'Shadcn UI', 'Framer Motion', 'Netlify'],
-    liveLink: 'https://manuelaguirre.dev/',
-    githubLink: 'https://github.com/aguirreMan/updated-portfolio-website',
-    blogSlug: 'portfolio-evolution',
   },
   {
     title: 'Dragon Ball Z',
@@ -59,7 +47,7 @@ export default function Projects() {
         <div className="grid md:grid-cols-2 gap-8">
           {projectData.map((project) => (
             <ProjectCard key={project.title}
-              className={project.isFeatured ? 'md:col-span-1' : 'md:col-span-1'}
+              className={project.isFeatured ? 'md:col-span-2' : 'md:col-span-1'}
               {...project} />
           ))}
         </div>

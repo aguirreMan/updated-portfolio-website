@@ -4,17 +4,15 @@ import { MDXProvider } from '@mdx-js/react'
 import { ArrowLeft } from 'lucide-react'
 import { mdxComponents } from '@/components/case-study/mdxComponents'
 
-/**
- * Shorter rail labels for headings that overflow the w-40 sidebar.
- * Any id not listed falls back to the section's own <h2> text, so this
- * stays small on purpose — the headings are the source of truth.
- */
 const NAV_LABELS: Record<string, string> = {
   differently: 'If I started over',
   future: 'Future work',
 }
 
-type Section = { id: string; label: string }
+interface Section {
+  id: string
+  label: string
+}
 
 export default function CaseStudyLayout() {
   const { pathname } = useLocation()
@@ -25,13 +23,7 @@ export default function CaseStudyLayout() {
   useEffect(() => {
     window.scrollTo(0, 0)
 
-    // Derive the rail from what the case study actually rendered. Child
-    // effects and DOM commit both precede this, so the sections exist.
-    // Studies opt into whichever sections they have — no hardcoded list to
-    // drift out of sync, and order always matches the page.
-    const elements = Array.from(
-      contentRef.current?.querySelectorAll<HTMLElement>('section[id]') ?? []
-    )
+    const elements = Array.from(contentRef.current?.querySelectorAll<HTMLElement>('section[id]') ?? [])
 
     setSections(
       elements.map((element) => ({
@@ -44,10 +36,6 @@ export default function CaseStudyLayout() {
     )
     setActiveSection(elements[0]?.id ?? '')
 
-    // rootMargin rather than a threshold: threshold is a ratio of the target,
-    // so a section several viewports tall can never reach a 0.15 ratio and the
-    // highlight sticks. This tracks whatever crosses the top reading band,
-    // offset by the scroll-mt-24 (96px) the sections use.
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries

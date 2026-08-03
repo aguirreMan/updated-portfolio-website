@@ -5,11 +5,10 @@ import Projects from '@/components/pages/Projects'
 import Contact from '@/components/pages/Contact'
 import NotFound from '@/components/pages/NotFound'
 import CaseStudyLayout from '@/components/case-study/CaseStudyLayout'
-//import Recipe from '@/components/pages/case-studies/Recipe'
 import Recipe from '@/components/pages/case-studies/Recipe.mdx'
-import Portfolio from '@/components/pages/case-studies/Portfolio'
+//import Portfolio from '@/components/pages/case-studies/Portfolio'
 import Gorilla from '@/components/pages/case-studies/Gorilla'
-import DragonBallz from '@/components/pages/case-studies/DragonBallz'
+import DragonBallz from '@/components/pages/case-studies/DragonBallz.mdx'
 import GoogleAnalyticsTracker from '@/components/page-components/GoogleAnalyticsTracker'
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
@@ -26,9 +25,6 @@ function App() {
           {/*Case Study Routes */}
           <Route path="projects/recipe-study" element={<CaseStudyLayout key='recipe-study' />}>
             <Route index element={<Recipe />} />
-          </Route>
-          <Route path="projects/portfolio-evolution" element={<CaseStudyLayout key='portfolio-evolution' />}>
-            <Route index element={<Portfolio />} />
           </Route>
           <Route path="projects/gorilla-ai" element={<CaseStudyLayout key='gorilla-ai' />}>
             <Route index element={<Gorilla />} />

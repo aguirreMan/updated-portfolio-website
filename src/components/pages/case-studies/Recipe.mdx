@@ -30,33 +30,15 @@ I built this full-stack application with React, TypeScript, Express, and the Spo
 
 </CaseStudySection>
 
-<CaseStudySection
-  id="origin"
-  title="Project Evolution"
->
-
-The project originally began as a community college assignment using
-hardcoded recipe data.
-
-After graduation I revisited the project and rebuilt it around the
-Spoonacular API so recipes could be searched dynamically instead of being
-maintained manually.
-
-Over time the project went through several rewrites as I learned more about
-React, TypeScript, routing, backend development, and frontend architecture.
-
-</CaseStudySection>
 
 <CaseStudySection
-  id="technical-decisions"
-  title="Technical Decisions"
+  id="ingredient-data"
+  title="Modeling ingredient data"
 >
 
-One major improvement was replacing fragile string parsing with strongly
-typed data models.
+Ingredient scaling became one of the more interesting engineering problems in the application. While the math itself was straightforward, the ingredient data returned by Spoonacular wasn't designed around scaling calculations.
 
-The original implementation extracted ingredient amounts from formatted
-strings.
+My original implementation extracted ingredient amounts from formatted strings using split() and parseFloat(). While this worked, the logic depended on the exact format of the API response and became increasingly fragile as the application evolved.
 
 ```tsx title="Original implementation"
 const parts = currentDataString
@@ -67,8 +49,10 @@ const parts = currentDataString
 const originalAmount = parseFloat(parts[0])
 ```
 
-After migrating to TypeScript, ingredient measurements became explicit
-objects instead of parsed strings.
+As I continued working on the project, I realized ingredient scaling wasn't really a string parsing problem it was a data modeling problem.
+
+
+Instead of treating ingredient measurements as formatted strings, I modeled them as explicit TypeScript objects.
 
 ```tsx title="MeasureUnit.ts"
 export interface MeasureUnit {
@@ -84,33 +68,38 @@ const scaledAmountUS =
   ingredient.measures.us.amount * scaleFormula
 ```
 
-Using typed API contracts made refactoring safer and reduced runtime bugs
-caused by unexpected response shapes.
+Once ingredient measurements became explicit numeric values, the scaling algorithm no longer depended on parsing formatted strings. The logic became easier to understand, simpler to test, and more resilient to changes in the API response.
 
 </CaseStudySection>
 
 <CaseStudySection
-  id="challenges"
-  title="Challenges Encountered"
+  id="transforming-data"
+  title="Transforming 3rd party data"
 >
+The Spoonacular API returns significantly more data than the frontend actually needs. Passing the raw response directly into React would have tightly coupled the UI to a third-party API contract and scattered transformation logic throughout the application.
 
-- Moving from a frontend-only project to an Express backend.
-- Learning React Router and replacing modal-based navigation.
-- Deploying independent frontend and backend services.
-- Managing API quotas while developing against Spoonacular.
+Instead, I introduced an Express backend that acts as the boundary between Spoonacular and the frontend. Rather than functioning solely as a proxy, the server transforms API responses into a shape the UI expects before they're returned to React.
+
+Centralizing that transformation reduced duplication in the frontend and made it easier to evolve the UI without depending on the exact structure of Spoonacular's responses.
 
 </CaseStudySection>
 
 <CaseStudySection
-  id="future"
-  title="Future Improvements"
+  id="sql-caching"
+  title="Reducing Third-Party API Requests"
 >
 
-Some improvements I'd still like to make include:
+Spoonacular's free tier limits the number of API requests that can be made each day. During development, repeatedly opening the same recipe while refining the UI quickly consumed that quota, even though the underlying recipe data rarely changed.
 
-- Saving favorite recipes.
-- Expanding automated testing.
-- Continuing to refine the component architecture.
-- Improving offline support.
+Rather than requesting the same recipes multiple times, I introduced a lightweight SQLite cache in the Express backend. The first request stores the recipe locally, and subsequent requests are served from the cache instead of calling the Spoonacular API again.
 
+The cache intentionally avoids expiration and invalidation logic. For this application, recipe data changes infrequently, so keeping the implementation simple provided the biggest benefit without introducing unnecessary complexity.
+
+</CaseStudySection>
+
+<CaseStudySection
+  id="recent-updates"
+  title="Ongoing development"
+>
+As the portfolio grew, I wanted to improve both data fetching and confidence when making changes. I migrated parts of the application to TanStack Query to simplify server state management and reduce manual loading and caching logic. More recently, I've been introducing automated testing with Vitest and React Testing Library to verify business logic and UI behavior as the codebase evolves.
 </CaseStudySection>
