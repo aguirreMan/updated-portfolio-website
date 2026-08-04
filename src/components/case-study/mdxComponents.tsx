@@ -1,15 +1,5 @@
 import type { ComponentProps } from 'react'
 
-/**
- * Styling for markdown elements compiled by MDX.
- *
- * Markdown can't carry classNames, so every intrinsic element MDX emits is
- * mapped here. This mirrors the inline classes used by the .tsx case studies
- * so an .mdx study renders identically to a hand-written one.
- *
- * Only applies to MDX-compiled markdown — plain JSX inside a .tsx file is
- * unaffected by this map.
- */
 export const mdxComponents = {
   // Wraps the entire MDX document, matching the outer spacing the .tsx
   // studies get from their own <div className='flex flex-col gap-14'>.
