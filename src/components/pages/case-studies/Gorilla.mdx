@@ -1,0 +1,69 @@
+import CaseStudyHeader from '@/components/case-study/CaseStudyHeader'
+import CaseStudySection from '@/components/case-study/CaseStudySection'
+
+<CaseStudyHeader
+  projectType="Fullstack AI Application"
+  title="Gorilla AI"
+  summary="A full stack application involving streaming, rate limiting, authentication, database storage"
+  stack={[
+    'React',
+    'TypeScript',
+    'Next.js',
+    'Tailwind CSS',
+    'Shadcn/UI',
+    'Vercel',
+  ]}
+  githubLink="https://github.com/aguirreMan/gorilla-ai"
+  liveLink="https://gorilla-ai-theta.vercel.app/"
+/>
+
+<CaseStudySection
+  id="problem"
+  title="The problem"
+>
+The hardest part of building an AI chat application wasn't integrating an AI model. It was managing everything that happens after the user presses Send.
+
+Streaming responses. Persisting conversations. Authenticating requests. Cancelling in-flight generations. Coordinating state across the interface.
+
+Those engineering problems ended up being far more interesting than calling an AI API.
+  
+</CaseStudySection>
+
+<CaseStudySection
+  id="streaming"
+  title="Streaming AI responses"
+>
+AI responses aren't returned all at once. They are generated incrementally, with small chunks of text arriving over an open connection. Instead of waiting for the model to finish before updating the interface, Gorilla AI processes those chunks as they arrive so users can begin reading immediately.
+
+```ts
+let buffer = ''
+let fullMessageContent = ''
+const encoder = new TextEncoder()
+
+const transformStream = new TransformStream({
+  async transform(chunk, controller) {
+    buffer += new TextDecoder().decode(chunk, { stream: true })
+
+    const lines = buffer.split('\n')
+    buffer = lines.pop() || ''
+```
+
+Rather than treating the response as a single payload, the application buffers incoming data, decodes it into text, and processes complete Server-Sent Events before forwarding each token to the client. This creates a responsive chat experience while the AI is still generating its answer.
+
+One architectural decision I made was delaying persistence until the stream successfully completed. Although users receive tokens immediately, I avoid writing partial responses to the database.
+
+```ts
+async flush() {
+  if (fullMessageContent.trim()) {
+    await saveChatMessage(
+      conversationId,
+      'assistant',
+      fullMessageContent
+    )
+  }
+}
+```
+
+Waiting until the stream finishes keeps conversation history consistent, reduces unnecessary database writes, and prevents incomplete AI responses from being stored if a request is cancelled midway through.
+
+</CaseStudySection>
