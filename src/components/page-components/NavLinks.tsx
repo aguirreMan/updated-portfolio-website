@@ -6,7 +6,7 @@ const links = [
   { label: 'About', to: '/about' },
   { label: 'Projects', to: '/projects' },
   { label: 'Contact', to: '/contact' },
-  { label: 'Resume', to: '/assets/Manuel_Aguirre_Resume_updated_2026.pdf', external: true },
+  { label: 'Resume', to: '/assets/Manuel_Aguirre_Resume_Updated_August.pdf', external: true },
 ]
 
 interface NavLinksProps {
