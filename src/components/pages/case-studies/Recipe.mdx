@@ -98,8 +98,109 @@ The cache intentionally avoids expiration and invalidation logic. For this appli
 </CaseStudySection>
 
 <CaseStudySection
-  id="recent-updates"
-  title="Ongoing development"
+  id="paginated-server-state"
+  title="Simplifying Paginated Server State"
 >
-As the portfolio grew, I wanted to improve both data fetching and confidence when making changes. I migrated parts of the application to TanStack Query to simplify server state management and reduce manual loading and caching logic. More recently, I've been introducing automated testing with Vitest and React Testing Library to verify business logic and UI behavior as the codebase evolves.
+The original recipe search hook managed the entire request lifecycle itself: loading state, cancellation, accumulated results, and pagination all lived inside React state and effects.
+
+```tsx title="paginated-server-state"
+const [recipes, setRecipes] = useState<SpoonacularResultsComplexSearch[]>([]) 
+const [totalResults, setTotalResults] = useState(0) 
+const [isLoading, setIsLoading] = useState(false)
+
+const controller = new AbortController()
+
+fetchRecipes(query, page, random, controller.signal) 
+  .then((response) => { 
+    setTotalResults(response.totalResults) 
+    setRecipes((prev) => page === 1 ? response.results : [...prev, ...response.results]) 
+  })
+```
+
+This worked, but it meant the hook was manually coordinating state that ultimately came from the server. I migrated the search flow to TanStack Query's useInfiniteQuery, letting the query cache own the request lifecycle
+while keeping the pagination rule explicit.
+
+```tsx
+queryFn: ({ pageParam = 1, signal }) => 
+  fetchRecipes(query, pageParam, random, signal), 
+getNextPageParam: (lastPage, allPages) => { 
+  const loadedRecipes = allPages.reduce( 
+    (total, page) => total + (page.results?.length ?? 0), 0 ) 
+  return loadedRecipes < lastPage.totalResults ? allPages.length + 1 : undefined 
+}
+```
+
+The important behavior was not simply that another request could be made.  Spoonacular returns a totalResults count, so the hook needs to accumulate pages while knowing when no additional page should be requested.
+
+I added hook-level tests around that edge case. The first page should expose another page while fewer recipes have been loaded than totalResults. After fetching the final page, the hook should flatten both responses for the UI
+and stop pagination.
+
+```tsx
+
+expect(result.current.recipes).toEqual(page1Mock.results)
+expect(result.current.hasNextPage).toBe(true)
+
+result.current.fetchNextPage()
+
+await waitFor(() =>
+  expect(result.current.isFetchingNextPage).toBe(false)
+)
+
+expect(result.current.recipes).toEqual([
+  ...page1Mock.results,
+  ...page2Mock.results,
+])
+
+```
+
+```tsx
+expect(result.current.hasNextPage).toBe(false)
+```
+
+</CaseStudySection>
+
+<CaseStudySection
+   id="testing-ingredient-scaling"
+   title="Testing ingredient scaling behavior"
+   date="August 10, 2026"
+>
+As ingredient scaling became more structured, I added tests around the behaviors most likely to produce incorrect recipe data. Incrementing and resetting the serving count were straightforward to verify, but the more important cases involved keeping multiple measurement systems synchronized and handling incomplete ingredient data.
+
+The application allows users to switch between US and metric measurements. Scaling therefore can't update only the measurement currently displayed in the UI. Both representations need to be recalculated from the same serving ratio so switching units doesn't reveal stale values.
+
+```tsx
+const scaleFormula = servingsSize / initialServings 
+
+const scaledAmountUS = ingredient.measures.us.amount * scaleFormula 
+const scaledAmountMetric = ingredient.measures.metric.amount * scaleFormula
+
+```
+
+I test both values after changing the serving size. For a recipe with 2 US cups and 240 metric units at 4 servings, increasing the recipe to 5 servings produces a scale factor of 1.25. Both representations should reflect that same change.
+
+```tsx
+
+act(() => {
+  result.current.incrementServings() 
+}) 
+
+const scaledIngredient = result.current.scaleIngredients[0] 
+
+expect(scaledIngredient.measures?.us.amount).toBe(2.5) 
+expect(scaledIngredient.measures?.metric.amount).toBe(300) 
+expect(scaledIngredient.formattedMeasures?.us).toContain('2.5')
+
+```
+
+Third-party ingredient data also isn't always complete. When an ingredient doesn't contain the measurements required for scaling, the hook preserves the original ingredient rather than attempting to calculate from missing values.
+
+```tsx
+const { result } = renderHook(() => 
+  useScaleServings(4, ingredientWithoutMeasures)
+)
+
+expect(result.current.scaleIngredients[0]).toEqual(ingredientWithoutMeasures[0])
+```
+These tests focus on the behavior behind the feature rather than the serving controls themselves: changing serving size must keep both unit systems synchronized, while incomplete API data must remain usable without producing invalid measurements.
+
 </CaseStudySection>
