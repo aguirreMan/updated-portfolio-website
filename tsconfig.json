@@ -16,9 +16,7 @@
   },
   "include": [
     "src",
-    ".storybook",
     "vite.config.ts",
-    "declarations.d.ts",
     "mdx.d.ts"
   ]
 }

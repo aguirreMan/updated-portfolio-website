@@ -297,7 +297,7 @@ The reducer currently manages both local interface behavior and data loaded from
 </CaseStudySection>
 
 <CaseStudySection
-  id="Client vs server state"
+  id="Client-vs-server-state"
   title="Separating client and server state"
 >
 The reducer solved one problem, but it also revealed another. Not every piece of state in the chat application actually belongs to the client. Conversations and message history originate from the database they're fetched, cached, and synchronized with the server. Those responsibilities are fundamentally different from client owned interactions like selecting a conversation or streaming a response.
@@ -324,12 +324,4 @@ export type ChatActions =
 Not every action here describes a client interaction. `SELECT_CHAT`, `STREAM_MESSAGE`, and `DESELECT_CHAT` are genuinely client-owned — they exist only in the browser and never touch the database. But `LOAD_CONVERSATIONS`, `LOAD_MESSAGES`, and their corresponding loading flags aren't describing client behavior at all. They're describing the result of a fetch the reducer isn't managing UI state there, it's caching server data.
 
 Moving those responsibilities into TanStack Query would create a cleaner architectural boundary. The reducer would become responsible only for client-owned interactions—selecting chats, streaming responses, and managing UI state while TanStack Query would own fetching, caching, and synchronizing conversations with the database. Each tool would focus on the responsibility it was designed for.
-</CaseStudySection>
-
-
-<CaseStudySection
-  id="ending"
-  title="Closing notes"
->
-Building Gorilla AI changed what I actually pay attention to when building an application. What began as a project to integrate an AI model became an exercise in request lifecycles, state coordination, and cost aware system design and those turned out to be the parts that mattered. The AI model was the easy part. Everything that happened after the user pressed send was the real engineering problem, and it's the one I'd choose to work on again.
 </CaseStudySection>
