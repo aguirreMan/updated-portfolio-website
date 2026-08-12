@@ -275,4 +275,47 @@ Conversations are now being fetched and cached through TanStack Query, which I v
 
 ![Case Study Image](/case-study/tanstack-devtool.png)
 
+Moving conversation selection into the URL 
+
+The next issue surfaced when conversation navigation moved to /dashboard/[chatId]. The sidebar could update the URL, but the rest of the chat still determined the active conversation from selectedChat in the reducer.
+
+That created two sources of truth:
+
+URL                  /dashboard/abc123
+Reducer              selectedChat = abc123
+
+Those values could diverge.
+
+Moving to file-based routing also exposed a layout problem. The sidebar, message history, and chat input originally lived inside dashboard/page.tsx. Navigating to /dashboard/[chatId] therefore replaced the page instead of preserving the chat interface.
+
+I introduced a nested dashboard layout so the chat shell persists across both routes:
+
+```ts
+app/(dashboard)/dashboard/
+├── layout.tsx
+├── page.tsx
+└── [chatId]/
+    └── page.tsx
+```
+
+The layout now owns the persistent chat shell while the routes represent whether a conversation is selected.
+
+```ts
+/dashboard             → new conversation
+/dashboard/[chatId]    → existing conversation
+```
+
+This also preserves a single useChat instance during the migration.
+
+The conversations array and its loading lifecycle are now out of the reducer, while selection and message state remain as the next stage of the migration.
+
+```ts
+export interface Chatstate {
+  conversationStore: ConversationStore
+  selectedChat: string | null
+  isLoadingMessages: boolean
+}
+
+```
+
 </CaseStudySection>
