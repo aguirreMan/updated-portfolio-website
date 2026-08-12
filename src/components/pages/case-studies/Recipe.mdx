@@ -21,12 +21,13 @@ import CaseStudySection from '@/components/case-study/CaseStudySection'
 
 <CaseStudySection
   id="overview"
-  title="Overview"
+  title="Making third-party data predictable"
+  date="updated August 12, 2026"
 >
 
-Recipe applications seem straightforward until they rely on live, third-party data. Search, ingredient scaling, nested API responses, request limits, and inconsistent data structures quickly introduce challenges beyond simply displaying recipes.
+Spoonacular controls the shape, completeness, availability, and request limits of the data, but the application still needs to provide predictable behavior on top of it.
 
-I built this full-stack application with React, TypeScript, Express, and the Spoonacular API to explore those problems. The architecture includes backend data transformation, SQLite caching, typed API contracts, and reusable frontend logic designed to make recipe discovery and serving adjustments more reliable and maintainable.
+Ingredient scaling, response transformation, caching, pagination, and incomplete measurements all became problems of deciding how much of that external API contract the application should own.
 
 </CaseStudySection>
 
@@ -34,9 +35,10 @@ I built this full-stack application with React, TypeScript, Express, and the Spo
 <CaseStudySection
   id="ingredient-data"
   title="Modeling ingredient data"
+  date="updated August 12, 2026"
 >
 
-Ingredient scaling became one of the more interesting engineering problems in the application. While the math itself was straightforward, the ingredient data returned by Spoonacular wasn't designed around scaling calculations.
+The math behind ingredient scaling was straightforward. The harder problem was that the ingredient data wasn't modeled for calculations.
 
 My original implementation extracted ingredient amounts from formatted strings using split() and parseFloat(). While this worked, the logic depended on the exact format of the API response and became increasingly fragile as the application evolved.
 
@@ -49,12 +51,12 @@ const parts = currentDataString
 const originalAmount = parseFloat(parts[0])
 ```
 
-As I continued working on the project, I realized ingredient scaling wasn't really a string parsing problem it was a data modeling problem.
+Ingredient scaling wasn't really a string parsing problem it was a data modeling problem.
 
 
 Instead of treating ingredient measurements as formatted strings, I modeled them as explicit TypeScript objects.
 
-```tsx title="MeasureUnit.ts"
+```tsx
 export interface MeasureUnit {
   amount: number
   unitShort: string
@@ -63,35 +65,110 @@ export interface MeasureUnit {
 
 The scaling logic then became straightforward arithmetic.
 
-```tsx title="scaleServings.ts"
-const scaledAmountUS =
-  ingredient.measures.us.amount * scaleFormula
+```tsx
+const scaledAmountUS = ingredient.measures.us.amount * scaleFormula
 ```
-
-Once ingredient measurements became explicit numeric values, the scaling algorithm no longer depended on parsing formatted strings. The logic became easier to understand, simpler to test, and more resilient to changes in the API response.
+Once ingredient measurements became explicit numeric values, scaling no longer depended on parsing presentation-formatted strings.
 
 </CaseStudySection>
 
 <CaseStudySection
   id="transforming-data"
   title="Transforming 3rd party data"
+  date="updated August 12, 2026"
 >
 The Spoonacular API returns significantly more data than the frontend actually needs. Passing the raw response directly into React would have tightly coupled the UI to a third-party API contract and scattered transformation logic throughout the application.
 
 Instead, I introduced an Express backend that acts as the boundary between Spoonacular and the frontend. Rather than functioning solely as a proxy, the server transforms API responses into a shape the UI expects before they're returned to React.
 
-Centralizing that transformation reduced duplication in the frontend and made it easier to evolve the UI without depending on the exact structure of Spoonacular's responses.
+Instructions are reduced to the fields the UI needs rather than exposing Spoonacular's complete instruction structure.
+
+```tsx
+  const steps: SpoonacularInstruction[] = instructionInformation[0].steps.map((step) => ({
+    number: step.number,
+    step: step.step
+  }))
+```
+
+Ingredients require a different transformation because the application needs both the original numeric measurements for scaling and formatted values for display.
+```tsx
+function formatIngredients(ingredients: Ingredient[]) {
+  return ingredients.map((ingredient) => ({
+    name: ingredient.name,
+    nameClean: ingredient.nameClean,
+    amount: ingredient.amount,
+    original: ingredient.original,
+    unit: ingredient.unit,
+    measures: ingredient.measures,
+    formattedMeasures: formatMeasurements(ingredient),
+  }))
+}
+```
+
+Numeric measurements remain available to the scaling logic, while formatted US and metric values are derived for presentation.
+
+```tsx
+  function formatMeasurements(ingredient: Ingredient): FormattedMeasures {
+    const us = ingredient.measures?.us
+    const metric = ingredient.measures?.metric
+    return {
+      us: us ? `${us.amount} ${us.unitShort}` : '',
+      metric: metric ? `${metric.amount} ${metric.unitShort}` : '',
+    }
+  }
+```
+
+The transformed pieces are assembled into the recipe shape that is cached and returned to the frontend.
+
+```tsx
+const recipeCachedData = {
+  id: ingredientInformation.id,
+  title: ingredientInformation.title,
+  image: ingredientInformation.image,
+  servings,
+  instructions: steps,
+  extendedIngredients: ingredientsArray,
+}
+
+saveRecipe(id, recipeCachedData)
+res.json(recipeCachedData)
+```
 
 </CaseStudySection>
 
 <CaseStudySection
   id="sql-caching"
   title="Reducing Third-Party API Requests"
+  date="updated August 12, 2026"
 >
 
 Spoonacular's free tier limits the number of API requests that can be made each day. During development, repeatedly opening the same recipe while refining the UI quickly consumed that quota, even though the underlying recipe data rarely changed.
 
 Rather than requesting the same recipes multiple times, I introduced a lightweight SQLite cache in the Express backend. The first request stores the recipe locally, and subsequent requests are served from the cache instead of calling the Spoonacular API again.
+
+```tsx
+const cachedRecipe = getRecipe(id)
+
+if (cachedRecipe) {
+  return res.json(cachedRecipe.recipe)
+}
+```
+
+Then after the cache miss, the recipe is fetched from the Spoonacular API and stored in the cache for future requests.
+
+```tsx
+const [instructionData, ingredientData] = await Promise.all([
+  fetchWithTimeout(instructionsWithKey, {}, 15000),
+  fetchWithTimeout(ingredientsWithKey, {}, 15000),
+])
+```
+
+After the data is then transformed into the desired format and stored in the cache, the recipe is returned to the client.
+
+```tsx
+saveRecipe(id, recipeCachedData)
+res.json(recipeCachedData)
+```
 
 The cache intentionally avoids expiration and invalidation logic. For this application, recipe data changes infrequently, so keeping the implementation simple provided the biggest benefit without introducing unnecessary complexity.
 
@@ -100,10 +177,11 @@ The cache intentionally avoids expiration and invalidation logic. For this appli
 <CaseStudySection
   id="paginated-server-state"
   title="Simplifying Paginated Server State"
+  date="updated August 12, 2026"
 >
 The original recipe search hook managed the entire request lifecycle itself: loading state, cancellation, accumulated results, and pagination all lived inside React state and effects.
 
-```tsx title="paginated-server-state"
+```tsx
 const [recipes, setRecipes] = useState<SpoonacularResultsComplexSearch[]>([]) 
 const [totalResults, setTotalResults] = useState(0) 
 const [isLoading, setIsLoading] = useState(false)
@@ -130,10 +208,9 @@ getNextPageParam: (lastPage, allPages) => {
 }
 ```
 
-The important behavior was not simply that another request could be made.  Spoonacular returns a totalResults count, so the hook needs to accumulate pages while knowing when no additional page should be requested.
+Spoonacular returns totalResults, so pagination stops when the number of accumulated recipes reaches that value.
 
-I added hook-level tests around that edge case. The first page should expose another page while fewer recipes have been loaded than totalResults. After fetching the final page, the hook should flatten both responses for the UI
-and stop pagination.
+I added hook level tests around the pagination boundary: the first page should expose another page, while the final accumulated result should stop further pagination.
 
 ```tsx
 
@@ -162,7 +239,7 @@ expect(result.current.hasNextPage).toBe(false)
 <CaseStudySection
    id="testing-ingredient-scaling"
    title="Testing ingredient scaling behavior"
-   date="August 10, 2026"
+   date="August 12, 2026"
 >
 As ingredient scaling became more structured, I added tests around the behaviors most likely to produce incorrect recipe data. Incrementing and resetting the serving count were straightforward to verify, but the more important cases involved keeping multiple measurement systems synchronized and handling incomplete ingredient data.
 

@@ -19,19 +19,19 @@ import CaseStudySection from '@/components/case-study/CaseStudySection'
 
 <CaseStudySection
   id="problem"
-  title="The problem"
+  title="Engineering the AI request lifecycle"
+  date="Updated August 11, 2026"
 >
 The hardest part of building an AI chat application wasn't integrating an AI model. It was managing everything that happens after the user presses Send.
 
 Streaming responses. Persisting conversations. Authenticating requests. Cancelling in-flight generations. Coordinating state across the interface.
-
-Those engineering problems ended up being far more interesting than calling an AI API.
   
 </CaseStudySection>
 
 <CaseStudySection
   id="streaming-ai"
   title="Streaming AI responses"
+  date="Updated August 11, 2026"
 >
 Streaming has two responsibilities: sending tokens to the browser immediately while simultaneously building a complete AI response that can be persisted once generation finishes.
 
@@ -75,36 +75,23 @@ Waiting until the stream finishes keeps conversation history consistent, reduces
 
 <CaseStudySection
   id="canceling-requests"
-  title="Canceling requests in flight"
+  title="Propagating cancellation end-to-end"
+  date="Updated August 11, 2026"
 >
-Streaming AI introduces a challenge that traditional request/response applications don't have: users don't always wait for the response to finish. They might switch to another conversation, start a new prompt, press stop, or leave the page entirely. In each of those cases, the request should terminate immediately instead of continuing to consume resources in the background.
 
-To solve this, I manage every AI request through a single `AbortController`. Before a new request begins — whether the user switches chats, deselects a conversation, sends another prompt, or presses Stop — the application cancels whatever request is currently active, then creates a fresh controller for the next one. This guarantees there's never more than one active request for a chat session, and every entry point shares the same cancellation behavior without needing to know about the others.
+Stopping the client from reading a streamed response isn't enough. The server can continue waiting on the AI model while the model generates tokens the user will never receive.
 
 ```ts
-setStreaming(true)
-if (abortController.current) {
-  abortController.current.abort()
-}
+abortController.current?.abort()
 abortController.current = new AbortController()
-const abortSignal = abortController.current.signal
+
 const response = await fetch('/api/openrouter', {
   method: 'POST',
-  signal: abortSignal,
+  signal: abortController.current.signal,
 })
-const reader = response.body.getReader()
-while (true) {
-  const { done } = await reader.read()
-  if (abortSignal.aborted) {
-    await reader.cancel()
-    return
-  }
-  if (done) break
-  // Process streamed tokens...
-}
+
 ```
 
-The UI reflects the same state, so the user always knows when a request is in flight, for example disabling the input with `disabled={isStreaming}`. Together these decisions keep the interface predictable by preventing overlapping requests while ensuring cancelled requests terminate cleanly across the client and server.
 
 The client cancelling a request is only half of the solution. The server also needs to stop processing the request; otherwise the AI model continues generating tokens that will never be displayed, while still consuming API credits.
 
@@ -114,25 +101,19 @@ const response = await fetch(
   {
     method: 'POST',
     signal: request.signal,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model,
-      messages,
-      stream: true,
-    }),
+    // ...
   }
 )
 ```
 
-By forwarding the client's abort signal to OpenRouter, the entire request lifecycle stays synchronized. When the user cancels a request, the browser stops listening, the server stops waiting, and the AI provider stops generating tokens. That keeps the interface responsive while avoiding unnecessary work and API costs.
+By forwarding the client's abort signal to OpenRouter, the entire request lifecycle stays synchronized. When the user cancels a request, the browser stops listening, the server stops waiting, and the AI provider stops generating tokens.
+
 </CaseStudySection>
 
 <CaseStudySection
   id="rate-limiting"
   title="Rate limiting AI requests"
+  date="Updated August 11, 2026"
 >
 
 Unlike a typical API endpoint, every request sent to `/api/openrouter` has a direct cost attached to it. Every prompt generates tokens, every token consumes API credits, and without safeguards a single user, buggy retry loop, or malicious script could generate thousands of expensive requests in seconds.
@@ -164,40 +145,30 @@ The order is intentional. Authentication establishes the identity of the caller,
 
 This means requests that fail either check never reach OpenRouter. No model is loaded, no tokens are generated, and no API credits are consumed. The cheapest AI request is the one that never has to execute.
 
-Rate limiting and request cancellation solve two different problems.
 
-Rate limiting determines whether a request should be allowed to start.
-
-Request cancellation determines whether an active request should continue running.
-
-Together they protect both the operational cost of the application and the user experience. One prevents unnecessary work before it begins, while the other stops work the moment it is no longer needed.
-
-Unlike request cancellation, which originates on the client, rate limiting originates on the server the client has no say.
+Rate limiting is enforced entirely on the server, so the client cannot bypass the quota or initiate AI generation before the request is validated.
 
 </CaseStudySection>
 
 
 <CaseStudySection
-id="state-architecture"
-title="From four states to one reducer"
-
+  id="state-architecture"
+  title="Centralizing coordinated state transitions"
+  date="Updated August 11, 2026"
 >
 
-The first version of Gorilla AI managed the chat interface through several independent `useState` hooks:
+The first version of Gorilla AI managed conversations, message history, loading state, and the active chat through separate `useState` hooks.
+
+The problem wasn't the number of state values. It was that they represented parts of the same workflow, and one user action could require several updates to stay synchronized.
 
 ```ts
 const [isLoading, setIsLoading] = useState(false)
 const [conversations, setConversations] = useState<Conversation[]>([])
 const [conversationStore, setConversationStore] = useState<ConversationStore>({})
-const [activeConversationId, setActiveConversationId] =
-  useState<string | null>(null)
+const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
 ```
 
-Each value had a clear responsibility. `conversations` populated the sidebar, `conversationStore` held the messages for each chat, `activeConversationId` tracked the currently selected conversation, and `isLoading` represented whether a request was in progress.
-
-The problem was not the number of hooks. It was that these values were not truly independent. They described different parts of the same conversation lifecycle, and a single user action often required several related updates that had to remain synchronized.
-
-Deleting a conversation exposed that weakness clearly:
+Deleting a conversation made that coupling visible.
 
 ```ts
 function handleDeleteConversation(id: string) {
@@ -217,46 +188,10 @@ function handleDeleteConversation(id: string) {
 }
 ```
 
-Deleting one conversation became three separate state updates. The sidebar entry had to be removed, the associated messages had to be deleted, and the active selection had to be cleared when necessary.
+A single delete required three coordinated updates: removing the conversation, deleting its message history, and clearing the active selection when necessary. Each setter was individually correct, but nothing guaranteed the complete transition happened as one operation.
 
-Nothing in the architecture guaranteed that all three updates would happen together. Forgetting one could leave the interface pointing at a conversation that no longer existed.
+As the chat workflow grew, I moved these coordinated transitions into a reducer so related state changes could be handled as a single operation.
 
-As streaming, message loading, conversation switching, and error handling were added, these coordinated updates became increasingly difficult to manage through independent setters. I refactored the chat workflow into a reducer so related state could be owned and updated as one system.
-
-```ts
-export interface ChatState {
-  conversations: Conversation[]
-  conversationStore: ConversationStore
-  selectedChat: string | null
-  isLoadingConversations: boolean
-  isLoadingMessages: boolean
-}
-```
-
-The reducer state creates one source of truth for the chat experience. Its actions describe the transitions the application supports:
-
-```ts
-export type ChatAction =
-  | { type: 'NEW_CHAT'; payload: Conversation }
-  | { type: 'SELECT_CHAT'; payload: string }
-  | { type: 'DELETE_CHAT'; payload: string }
-  | {
-      type: 'ADD_USER_MESSAGE'
-      payload: { id: string; message: string }
-    }
-  | { type: 'ADD_ASSISTANT_MESSAGE'; payload: { id: string } }
-  | {
-      type: 'STREAM_MESSAGE'
-      payload: { id: string; content: string }
-    }
-  | {
-      type: 'LOAD_MESSAGES'
-      payload: { id: string; messages: Message[] }
-    }
-  | { type: 'DESELECT_CHAT' }
-```
-
-The action union does more than provide TypeScript safety. It acts as a compact description of the behaviors the chat system understands: creating conversations, selecting them, loading their messages, streaming responses, and deleting them.
 
 The previous delete workflow can now be represented as a single dispatch:
 
@@ -288,40 +223,56 @@ case 'DELETE_CHAT': {
 }
 ```
 
-Removing a conversation, deleting its messages, and clearing the active selection now happen together in one authoritative location. Components no longer need to understand every state change involved; they describe what happened by dispatching an action, and the reducer decides how the application transitions.
+Components now describe what happened, while the reducer owns the complete state transition.
 
 The refactor did not make the chat workflow less complex. It made that complexity explicit and gave related state transitions one predictable place to live.
-
-The reducer currently manages both local interface behavior and data loaded from the server. As Gorilla AI continues to evolve, I would separate those responsibilities by introducing TanStack Query for conversations and message history, leaving the reducer focused on client-owned interactions and transitions.
 
 </CaseStudySection>
 
 <CaseStudySection
   id="Client-vs-server-state"
   title="Separating client and server state"
+  date="updated August 12, 2026"
 >
-The reducer solved one problem, but it also revealed another. Not every piece of state in the chat application actually belongs to the client. Conversations and message history originate from the database they're fetched, cached, and synchronized with the server. Those responsibilities are fundamentally different from client owned interactions like selecting a conversation or streaming a response.
-
-Today the reducer manages both responsibilities. While this works well, it also means client interactions and server data live inside the same state container. As the application continues to grow, I would separate those concerns by introducing TanStack Query. Conversations and message history would become server state, while the reducer would remain responsible for client-owned behavior such as chat selection, streaming state, and UI interactions.
+The reducer solved the coordination problem, but centralizing the chat workflow exposed a different issue: it was now managing both client-owned interactions and data loaded from the server.
 
 ```ts
 export type ChatActions =
-  | { type: 'NEW_CHAT'; payload: Conversation }
   | { type: 'SELECT_CHAT'; payload: string }
-  | { type: 'DELETE_CHAT'; payload: string }
-  | { type: 'ADD_USER_MESSAGE'; payload: { id: string; message: string } }
-  | { type: 'ADD_ASSISTANT_MESSAGE'; payload: { id: string } }
-  | { type: 'REMOVE_LAST_MESSAGE'; payload: { id: string } }
-  | { type: 'SET_LAST_ERROR_MESSAGE'; payload: { id: string; error: string } }
   | { type: 'STREAM_MESSAGE'; payload: { id: string; content: string } }
-  | { type: 'SET_LOADING_CONVERSATIONS'; payload: boolean }        // server state
-  | { type: 'SET_LOADING_MESSAGES'; payload: boolean }             // server state
   | { type: 'DESELECT_CHAT' }
-  | { type: 'LOAD_CONVERSATIONS'; payload: Conversation[] }        // server state
-  | { type: 'LOAD_MESSAGES'; payload: { id: string; messages: Message[] } } // server state
+  | { type: 'SET_LOADING_CONVERSATIONS'; payload: boolean }
+  | { type: 'SET_LOADING_MESSAGES'; payload: boolean }
+  | { type: 'LOAD_CONVERSATIONS'; payload: Conversation[] }
+  | { type: 'LOAD_MESSAGES'; payload: { id: string; messages: Message[] } }
 ```
 
-Not every action here describes a client interaction. `SELECT_CHAT`, `STREAM_MESSAGE`, and `DESELECT_CHAT` are genuinely client-owned — they exist only in the browser and never touch the database. But `LOAD_CONVERSATIONS`, `LOAD_MESSAGES`, and their corresponding loading flags aren't describing client behavior at all. They're describing the result of a fetch the reducer isn't managing UI state there, it's caching server data.
+The reducer wasn't only coordinating client transitions anymore. LOAD and SET_LOADING actions were also making it responsible for the lifecycle of database-backed data.
 
-Moving those responsibilities into TanStack Query would create a cleaner architectural boundary. The reducer would become responsible only for client-owned interactions—selecting chats, streaming responses, and managing UI state while TanStack Query would own fetching, caching, and synchronizing conversations with the database. Each tool would focus on the responsibility it was designed for.
+```ts
+const { deselectChat } = useChatContext()
+
+<Link href="/dashboard" onClick={deselectChat}>
+  Gorilla AI
+</Link>
+  
+```
+
+That responsibility also propagated through Context. The dashboard navigation only needed deselectChat, but it consumed the same chat context that exposed messages, loading state, streaming state, and the rest of the workflow.
+
+This refactor started by moving conversations and their loading lifecycle out of the reducer. As those responsibilities move, I'm reevaluating how much global chat state the application actually needs.
+
+```ts
+const { data, isLoading, error } = useQuery({
+  queryKey: ['conversations'],
+  queryFn: async () => {
+    const response = await fetch('/api/conversations')
+  },
+})
+```
+Conversations are now being fetched and cached through TanStack Query, which I verified through the query devtools. The reducer still retains conversation-related state while I migrate the remaining selection and message workflow.
+
+
+![Case Study Image](/case-study/tanstack-devtool.png)
+
 </CaseStudySection>
