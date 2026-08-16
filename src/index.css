@@ -1,23 +1,33 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
-@tailwind utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
 
 @theme inline {
   --radius-md: calc(var(--radius) - 2px);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
+
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-blue-dim: var(--accent-blue-dim);
+
   --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-input: var(--input);
@@ -47,17 +57,69 @@
   --ring: #152135;
 }
 
+/* Rehype syntax highlighting (Standard CSS properties) */
+
+figure[data-rehype-pretty-code-figure] {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background-color: var(--card);
+}
+
+figure[data-rehype-pretty-code-figure] pre {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  margin: 0;
+  padding: 0.875rem 0;
+
+  overflow-x: auto;
+
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875rem;
+  line-height: 1.625;
+}
+
+
+figure[data-rehype-pretty-code-figure] code {
+  display: block;
+}
+
+figure[data-rehype-pretty-code-figure] [data-line] {
+  display: inline-block;
+  width: 100%;
+  padding: 0 1rem;
+}
+
+/* Highlighted line style ({2,6}) */
+figure[data-rehype-pretty-code-figure] [data-highlighted-line] {
+  background-color: rgba(59, 130, 246, 0.10);
+  border-left: 2px solid var(--accent-blue);
+}
+
+
+/* Global resets & Scrollbars */
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: var(--border);
+    outline-color: color-mix(in srgb, var(--ring) 50%, transparent);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 33, 91, 0.6) rgba(16, 16, 24, 0.5);
   }
 
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--background);
+    color: var(--foreground);
   }
-}
 
-@layer base {
   ::-webkit-scrollbar {
     width: 8px;
   }
@@ -73,10 +135,5 @@
 
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 33, 91, 0.9);
-  }
-
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 33, 91, 0.6) rgba(16, 16, 24, 0.5);
   }
 }

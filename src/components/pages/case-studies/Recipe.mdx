@@ -42,7 +42,7 @@ The math behind ingredient scaling was straightforward. The harder problem was t
 
 My original implementation extracted ingredient amounts from formatted strings using split() and parseFloat(). While this worked, the logic depended on the exact format of the API response and became increasingly fragile as the application evolved.
 
-```tsx title="Original implementation"
+```tsx
 const parts = currentDataString
   .split(':')[1]
   .trim()
