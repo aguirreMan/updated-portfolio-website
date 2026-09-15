@@ -319,3 +319,234 @@ export interface Chatstate {
 ```
 
 </CaseStudySection>
+
+<CaseStudySection
+  id="separating-client-and-server-state"
+  title="Separating client and server state"
+  date="Updated September 15, 2026"
+>
+The reducer solved the coordination problem, but centralizing the chat workflow exposed a different issue: it was now managing both client-owned interactions and data loaded from the server.
+ 
+```ts
+export type ChatActions =
+  | { type: 'SELECT_CHAT'; payload: string }
+  | { type: 'STREAM_MESSAGE'; payload: { id: string; content: string } }
+  | { type: 'DESELECT_CHAT' }
+  | { type: 'SET_LOADING_CONVERSATIONS'; payload: boolean }
+  | { type: 'SET_LOADING_MESSAGES'; payload: boolean }
+  | { type: 'LOAD_CONVERSATIONS'; payload: Conversation[] }
+  | { type: 'LOAD_MESSAGES'; payload: { id: string; messages: Message[] } }
+```
+ 
+The reducer wasn't only coordinating client transitions anymore. `LOAD` and `SET_LOADING` actions were also making it responsible for the lifecycle of database-backed data. That responsibility propagated through Context — a component that only needed `deselectChat` still consumed the same chat context that exposed messages, loading state, and streaming state.
+ 
+```ts
+const { deselectChat } = useChatContext()
+ 
+<Link href="/dashboard" onClick={deselectChat}>
+  Gorilla AI
+</Link>
+```
+ 
+I started by moving conversations and their loading lifecycle out of the reducer entirely, into TanStack Query:
+ 
+```ts
+const { data, isLoading, error } = useQuery({
+  queryKey: ['conversations'],
+  queryFn: async () => {
+    const response = await fetch('/api/conversations')
+  },
+})
+```
+ 
+I verified the cache behavior through the query devtools:
+ 
+![Case Study Image](/case-study/tanstack-devtool.png)
+ 
+That migration exposed a routing problem. Conversation navigation moved to `/dashboard/[chatId]`, but the rest of the application still determined the active conversation from `selectedChat` in the reducer — two sources of truth that could silently diverge:
+ 
+```text
+URL       /dashboard/abc123
+Reducer   selectedChat = abc123
+```
+ 
+Rather than synchronizing them, I removed the duplicate state. The URL is now the single source of truth for which conversation is active:
+ 
+```ts
+const params = useParams<{ chatId?: string }>()
+const activeConversationId = params.chatId ?? null
+ 
+function handleConversationSelect(chatId: string) {
+  router.push(`/dashboard/${chatId}`)
+  onClose()
+}
+```
+ 
+This also clarified what each route means:
+ 
+```text
+/dashboard             → new conversation
+/dashboard/[chatId]    → persisted conversation
+```
+ 
+Moving to file-based routing surfaced a layout problem, too. The sidebar, message history, and chat input originally lived inside `dashboard/page.tsx`, so navigating to `/dashboard/[chatId]` replaced the whole page instead of preserving the chat shell. I introduced a nested dashboard layout so the shell persists across both routes, while each route owns only its own presentation:
+ 
+```text
+app/(dashboard)/dashboard/
+├── layout.tsx
+├── page.tsx
+└── [chatId]/
+    └── page.tsx
+```
+ 
+**Reducing the reducer to temporary message state**
+ 
+With conversation identity in the URL and conversations in TanStack Query, I kept shrinking the reducer's responsibilities. Persisted messages are now fetched through a query keyed by conversation ID:
+ 
+```ts
+const {
+  messages: fetchedMessages,
+  isLoading,
+  error,
+} = useFetchMessages(chatId)
+```
+ 
+The reducer no longer owns fetched message history. It represents only messages that temporarily exist on the client while a response is being generated:
+ 
+```ts
+export type ChatActions =
+  | { type: 'ADD_USER_MESSAGE'; payload: { message: string } }
+  | { type: 'ADD_ASSISTANT_MESSAGE' }
+  | { type: 'APPEND_STREAM_CONTENT'; payload: { content: string } }
+  | { type: 'REMOVE_EMPTY_ASSISTANT_MESSAGE' }
+  | { type: 'RESET_PENDING_MESSAGES' }
+```
+ 
+The UI combines authoritative server history with temporary streaming state:
+ 
+```ts
+const displayMessages = [
+  ...fetchedMessages,
+  ...pendingMessages,
+]
+```
+ 
+This gives each piece of state one clear owner:
+ 
+```text
+TanStack Query   → persisted conversations and messages
+URL              → active conversation identity
+Reducer          → temporary pending messages
+useChat(chatId)  → coordinates the active conversation lifecycle
+```
+ 
+When generation completes, the messages query is invalidated so TanStack Query can fetch the persisted server version before the temporary messages are discarded:
+ 
+```ts
+await queryClient.invalidateQueries({
+  queryKey: ['messages', chatId],
+})
+ 
+dispatch({
+  type: 'RESET_PENDING_MESSAGES',
+})
+```
+ 
+That handoff exposed one more edge case: for a brief window, the freshly fetched messages and the pending messages can represent the same data — the assistant's just-completed reply exists in both the server response and the local stream buffer simultaneously. Invalidating the query before clearing pending prevents the UI from falling back to stale history while the refetch is running, but it does not make the handoff atomic. There can still be a brief render where the same messages exist in both collections.
+ 
+Rather than assuming two independently updated arrays will reconcile themselves, I'm treating that transition as an explicit synchronization problem. The next stage of the refactor is to give temporary streaming state a clearer identity and lifecycle so it can be replaced cleanly once the persisted server version becomes authoritative.
+ 
+**Separating the persistent shell from conversation behavior**
+ 
+Earlier versions of the dashboard layout instantiated the main chat hook itself and passed messages, streaming state, and callbacks down through the shell. As the state boundaries above became clearer, that responsibility moved downward. The shared layout now owns only persistent presentation:
+ 
+```text
+DashboardLayout
+├── Sidebar
+└── children
+```
+ 
+And the persisted conversation route owns its own conversation-specific behavior:
+ 
+```ts
+const { chatId } = useParams<{ chatId: string }>()
+ 
+const {
+  messages,
+  isLoading,
+  sendMessage,
+  isStreaming,
+  stopStreaming,
+} = useChat(chatId)
+```
+ 
+The route is now responsible for interpreting `chatId`; `useChat` coordinates everything that follows from it.
+ 
+**Designing the first-message lifecycle**
+ 
+The next architectural problem appeared while redesigning `/dashboard` itself. I wanted a new conversation to behave like a modern chat interface: navigating to "New Chat" shouldn't immediately create an empty database record. The conversation should begin only when the user submits the first message.
+ 
+```text
+/dashboard
+    ↓
+user submits first message
+    ↓
+server creates conversation
+    ↓
+conversation receives an ID
+    ↓
+generation begins
+    ↓
+/dashboard/[chatId]
+```
+ 
+I started separating conversation creation from AI generation. A dedicated conversations endpoint can create the persisted conversation and return its server-generated ID. `/api/openrouter` now verifies that the supplied conversation exists and belongs to the authenticated user before beginning generation.
+ 
+```text
+POST /api/conversations
+→ create persisted conversation
+→ return conversation ID
+ 
+POST /api/openrouter
+→ verify conversation ownership
+→ generate response
+→ persist messages
+```
+ 
+This moves the architecture toward a clearer server boundary: the client can request a new conversation, but the server determines which persisted conversation exists and verifies ownership before allowing AI generation. There is still some cleanup remaining in this boundary — the generation route currently retains older conversation-persistence behavior from the previous architecture, so conversation creation and conversation metadata updates aren't completely separated yet.
+ 
+It also revealed a React lifecycle problem: `/dashboard` and `/dashboard/[chatId]` are different page components, so navigating after the first message unmounts the landing page while the AI response may still be streaming. If the reducer, `AbortController`, and streaming state are owned by that page, their React owner disappears mid-transition.
+ 
+The dashboard layout survives navigation between both child routes, which gives that temporary state a natural lifetime boundary. The architecture I'm currently building toward:
+ 
+```text
+DashboardLayout
+│
+└── ChatSessionProvider
+    │
+    ├── active streaming chatId
+    ├── pending messages
+    ├── streaming status
+    └── AbortController
+    │
+    ├── Sidebar
+    │
+    └── children
+        ├── /dashboard              → new-chat presentation
+        └── /dashboard/[chatId]     → persisted-chat presentation
+```
+ 
+Importantly, this doesn't move server state back into Context. TanStack Query keeps owning persisted conversations and messages — the provider would own only ephemeral state whose lifetime needs to survive the route transition. Tagging that state with its conversation ID also prevents an active stream from leaking into the wrong conversation if the user navigates away mid-generation:
+ 
+```ts
+const pendingForCurrentChat =
+  session.chatId === chatId
+    ? session.pendingMessages
+    : []
+```
+ 
+This stage changed how I think about state ownership. The question isn't only whether state belongs to the client or the server — it's how long that state needs to live. Persisted data belongs to the server cache. Route identity belongs to the URL. Temporary streaming data belongs to the client, but its owner has to survive whatever route transitions happen while generation is still in flight.
+ 
+*Currently in progress: defining the smallest possible `ChatSessionProvider` contract before moving the existing streaming lifecycle out of `useChat`.*
+ 
+</CaseStudySection>
