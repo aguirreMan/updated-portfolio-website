@@ -31,7 +31,7 @@ Streaming responses. Persisting conversations. Authenticating requests. Cancelli
 <CaseStudySection
   id="streaming-ai"
   title="Streaming AI responses"
-  date="Updated August 11, 2026"
+  date="Updated September 23, 2026"
 >
 Streaming has two responsibilities: sending tokens to the browser immediately while simultaneously building a complete AI response that can be persisted once generation finishes.
 
@@ -71,6 +71,56 @@ async flush() {
 
 Waiting until the stream finishes keeps conversation history consistent, reduces unnecessary database writes, and prevents incomplete AI responses from being stored if a request is cancelled midway through.
 
+While this code works this code here 
+```ts 
+const parseData = JSON.parse(jsonData)
+const content = parseData.choices[0]?.delta?.content
+```
+
+is not type-safe because ```ts JSON.parse()```
+returns a type any 
+which meant the parsed AI response could be accessed without TypeScript verifying its structure. 
+The code compiled, but there was no guarantee that the external response actually matched the shape the application expected.
+
+I changed the runtime value to type unknown forcing the response to prove its shape before the application could access it.
+
+```ts
+const parseData: unknown = JSON.parse(jsonData)
+
+if (!streamingChunkValidation(parseData)) continue
+
+const content = parseData.choices[0]?.delta?.content
+
+```
+
+The application expects each streaming event to match this structure
+ 
+ ```ts
+
+export interface StreamingChunk {
+  choices: Array<{
+    delta?: {
+      content?: string
+    }
+  }>
+}
+```
+
+But the external response now has to satisfy that contract before the streaming logic uses it.
+
+```ts
+function streamingChunkValidation(value: unknown): value is StreamingChunk {
+  if (typeof value !== 'object' || value === null) return false
+  if (!('choices' in value)) return false
+
+  const choices = value.choices
+
+  if (!Array.isArray(choices)) return false
+
+  // validate each streaming choice...
+}
+```
+This moved the streaming route from trusting the provider response to validating data at the boundary before it enters the application.
 </CaseStudySection>
 
 <CaseStudySection
@@ -321,8 +371,8 @@ export interface Chatstate {
 </CaseStudySection>
 
 <CaseStudySection
-  id="separating-client-and-server-state"
-  title="Separating client and server state"
+  id="refining-chat-architecture"
+  title="Refining the chat architecture"
   date="Updated September 15, 2026"
 >
 The reducer solved the coordination problem, but centralizing the chat workflow exposed a different issue: it was now managing both client-owned interactions and data loaded from the server.
@@ -549,4 +599,95 @@ This stage changed how I think about state ownership. The question isn't only wh
  
 *Currently in progress: defining the smallest possible `ChatSessionProvider` contract before moving the existing streaming lifecycle out of `useChat`.*
  
+</CaseStudySection>
+
+<CaseStudySection
+id="synchronizing-persisted-messages"
+title="Synchronizing streamed and persisted messages"
+date="Updated September 23, 2026"
+>
+
+
+After moving persisted message history into TanStack Query the reducer was responsible only for temporary messages created while a response was being generated.
+
+```ts
+const { messages: fetchedMessages } = useFetchMessages(chatId)
+
+const [pendingMessages, dispatch] = useReducer(chatReducer, [])
+
+const displayMessages = [
+  ...fetchedMessages,
+  ...pendingMessages,
+]
+```
+This separation gave persisted and temporary state clear owners, but it introduced a synchronization problem when generation finished.
+
+While a response was streaming, pendingMessages contained the user's newest message and the assistant response. The server eventually persisted both messages to the database, but the TanStack Query cache did not automatically know that the API route had changed the underlying data.
+
+Clearing the temporary messages before synchronizing the query could therefore make the newest messages disappear from the interface:
+
+fetchedMessages  → previously persisted history
+pendingMessages  → new user + assistant messages
+
+generation finishes
+        
+server persists new messages
+        
+RESET_PENDING_MESSAGES
+        
+pendingMessages = []
+        
+TanStack Query still contains stale history
+        
+refresh required to see the latest messages
+
+The database was correct, but the client had removed the temporary copy of the new messages before its cached server state had been synchronized.
+
+Instead of clearing pending state immediately, I made the transition back to server-owned state explicit. A small synchronization hook invalidates the messages query for the active conversation:
+```ts
+export function useSyncMessages() {
+  const query = useQueryClient()
+
+  async function syncMessages(chatId: string) {
+    await query.invalidateQueries({
+      queryKey: ['messages', chatId],
+    })
+  }
+
+  return { syncMessages }
+}
+```
+useChat now waits for that synchronization before discarding its temporary messages:
+```ts
+finally {
+  setStreaming(false)
+
+  await syncMessages(chatId)
+
+  dispatch({
+    type: 'RESET_PENDING_MESSAGES',
+  })
+}
+```
+
+The intended handoff now has an explicit order:
+
+Reducer owns temporary streaming messages
+         
+server persists messages
+        
+TanStack Query synchronizes
+        
+reducer clears temporary state
+        
+TanStack Query resumes ownership of persisted history
+
+Making this synchronization explicit prevents useChat from intentionally clearing its temporary state before asking TanStack Query to refresh the persisted history.
+
+The handoff, however, is still not atomic. fetchedMessages and pendingMessages remain independently managed collections. During synchronization, the newly persisted messages can briefly exist in both, creating the possibility of duplicate messages during the transition.
+
+Rather than treating that as the same problem, I am treating it as the next stage of the synchronization work: temporary messages need a clearer identity and lifecycle so the persisted server version can replace them cleanly.
+
+As useChat became more focused on coordinating the message lifecycle, I also moved the lower-level stream parsing into readStream, keeping the hook responsible for orchestration rather than the mechanics of decoding SSE events.
+
 </CaseStudySection>
