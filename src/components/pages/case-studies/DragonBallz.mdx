@@ -22,50 +22,254 @@ import CaseStudySection from '@/components/case-study/CaseStudySection'
 <CaseStudySection
   id="visualization"
   title="Visualizing Power Levels"
+  date="updated September 27, 2026"
 >
 
-Character power levels seem easy to visualize until the underlying data spans several orders of magnitude. The Dragon Ball API includes values ranging from the low thousands to numbers beyond JavaScript's safe integer range, along with unknown and googolplex-scale values.
+Character power levels seem easy to visualize until the underlying data spans several orders of magnitude. The Dragon Ball API includes values ranging from the low thousands to 
+numbers beyond JavaScript's safe integer range, along with unknown and googolplex-scale values.
 
 A traditional linear progress bar quickly became meaningless because almost every character appeared as 0% compared to the strongest fighters.
 
-To solve this, I parsed power levels into BigInt values and applied logarithmic scaling so the visualization remained useful across the entire roster. Supporting utilities also handled unknown and malformed values gracefully, allowing the UI to remain consistent regardless of the API response.
+To solve this, I parsed power levels into BigInt values and applied logarithmic scaling so the visualization remained useful across the entire roster. 
+Supporting utilities also handled unknown and malformed values gracefully, allowing the UI to remain consistent regardless of the API response.
 </CaseStudySection>
 
 <CaseStudySection
-id="Arena-game"
-title="Managing Arena State"
+  id="power-level-data"
+  title="Normalizing power level data"
+  date="Updated September 27, 2026"
 >
-As the Arena feature grew, what began as a handful of independent state variables became a connected workflow. Fighter selection, countdowns, battle phases, winner calculation, and resetting the arena all depended on one another.
+The API doesn't return power levels as consistent numeric values. Instead, values can arrive as strings such as 19.84 Octillion, 
+include commas or inconsistent formatting, or represent unknown and googolplex-scale power levels. Before those values could be sorted, compared, or visualized, 
+I needed a consistent numeric representation the rest of the application could work with.
 
-Coordinating those relationships with multiple useState hooks became increasingly difficult because each update affected several parts of the interface.
+I created parsing utilities that normalize the API values into BigInt, map named magnitudes such as million through octillion to their numeric equivalents, and handle decimal 
+values without relying on floating-point arithmetic. Unknown or unsupported values return null, allowing the UI to handle them explicitly rather than treating them as 
+valid power levels.
 
-I redesigned the feature around a reducer so state transitions were represented as explicit actions rather than scattered updates across the component.
+```ts 
+function parseDecimalsBigInt(numberString: string, multiplier: bigint): bigint {
+    if (!numberString.includes('.')) {
+      return BigInt(numberString) * multiplier
+    }
+
+    const [integerPart, fractionPart] = numberString.split('.')
+    const exponent = multiplier.toString().length - 1 
+
+    const paddedFraction = (fractionPart + '0'.repeat(exponent)).slice(0, exponent)
+
+    return BigInt((integerPart || '0') + paddedFraction)
+}
+
+
+```
+
 </CaseStudySection>
 
 <CaseStudySection
-  id="upset"
-  title="Adding randomness to a game"
+  id="compare-transformations"
+  title="Comparing character transformations"
+  date="Updated September 27, 2026"
 >
 
-The Arena feature wasn't intended to be a power level calculator where the strongest character always wins. If every matchup produced the same predictable result, the game quickly became repetitive because there was no reason to replay battles once the outcome was known.
+Normalizing power levels also made the data useful beyond individual character profiles. The transformations page acts as a power ranking across the roster, but sorting the 
+API values directly wouldn't produce a meaningful order when values such as 500 Million, 2 Billion, and 19.84 Octillion are represented as strings.
 
-At the same time, making every battle completely random wouldn't reflect the differences between characters. Stronger fighters still needed a significant advantage while leaving room for occasional upsets.
+Instead of creating separate parsing logic for the leaderboard, I reused the same parseKi utility before comparing transformations. 
+This allowed transformations to be ranked by their actual power rather than their string representation while keeping the interpretation of Ki consistent across the application.
 
-To balance those competing goals, I compared the fighters' power levels using the same logarithmic scaling used throughout the application. The resulting difference was then used to influence the probability of each fighter winning, allowing evenly matched battles to feel competitive while still making rare upsets possible.
 
-The Arena also exposes an isUpset flag whenever a lower-powered fighter wins. Besides making the result visible in the UI, it gave me a way to distinguish expected outcomes from genuinely surprising ones and made battles feel more memorable.
+```ts 
+export function sortTransformationsByKI(transformations: Transformations[]): Transformations[] {
+  return [...transformations].sort((a, b) => {
+    const kiA = parseKi(a.ki)
+    const kiB = parseKi(b.ki)
+
+    if (typeof kiA !== 'bigint' || typeof kiB !== 'bigint') return 0
+    if (kiB < kiA) return -1
+    if (kiB > kiA) return 1
+    return 0
+  })
+}
+
+```
+The same normalized power-level data could now support ranking transformations, comparing forms on character profiles, and calculating visual power scales without each 
+feature needing its own interpretation of the API values.
 
 </CaseStudySection>
 
 <CaseStudySection
-  id="reusable-components"
-  title="Building reusable UI components"
+  id="reusable-power-visualizations"
+  title="Visualizing Power Across Different Contexts"
+  date="Updated September 27, 2026"
+>
+Power levels appear throughout the application, but the comparison being represented isn't always the same. A character ranking may compare a fighter against the strongest 
+character in the roster, transformations can be measured relative to a character's strongest form, while post-fight results need to communicate the difference between two 
+selected fighters.
+
+Rather than coupling the progress bar to any one of those calculations, I kept CharacterPowerProgress focused only on rendering a percentage. 
+Each feature determines its own comparison and passes the resulting value into the same visual component.
+
+```ts
+
+<CharacterPowerProgress percentage={percentage} />
+```
+
+This allowed the application to maintain a consistent visual language for power while letting the meaning of that visualization change with the surrounding context.
+
+
+</CaseStudySection>
+
+<CaseStudySection
+  id="arena"
+  title="Dragon Ball Arena"
+  date="Updated September 27, 2026"
+>
+The Arena combines several pieces of the application into a single interactive workflow. Users select two fighters, start a battle, move through a countdown and 
+comparison sequence, receive a winner, and can reset the Arena for another matchup.
+
+The first version managed those interactions with separate useState values. That worked while the feature was small, but the states weren't actually independent. 
+Starting a battle depended on both fighter slots being filled, selecting a winner changed the battle phase, and resetting needed to return several related values to their 
+initial state at the same time.
+
+As those relationships grew, I moved the Arena state into a reducer and represented the workflow through explicit actions.
+
+```ts 
+
+type DragonBallArenaPhase =
+  | 'selecting_characters'
+  | 'characters_ready'
+  | 'comparing_characters'
+  | 'picking_winner'
+
+type DragonBallArenaAction =
+  | { type: 'SET_ACTIVE_SLOT'; slot: 'left' | 'right' | null }
+  | { type: 'SELECT_CHARACTER';  character: Character | null }
+  | { type: 'SWAP_CHARACTERS' }
+  | { type: 'START_BATTLE'}
+  | { type: 'PICK_WINNER'; luck: number }
+  | { type: 'RESET_ARENA' }
+```
+
+This made state changes describe events in the Arena rather than individual variable updates. START_BATTLE moves the interface into its comparison phase, 
+PICK_WINNER records the result and advances the workflow, while RESET_ARENA restores the related battle state together.
+
+I wrapped the reducer in a useDragonBallArena hook that exposes operations such as selectCharacter, startBattle, and resetArena. 
+Components interact with those operations instead of managing the reducer directly, keeping the Arena's state transitions and the UI that consumes them separate.
+
+
+</CaseStudySection>
+
+<CaseStudySection
+  id="coordinating fight"
+  title="Coordinating a fight"
+  date="Updated September 27, 2026"
 >
 
-As the application expanded beyond browsing characters into interactive gameplay, many interface patterns began repeating throughout the project. Character cards, power visualizations, badges, dialogs, and arena controls all needed to present different data while maintaining a consistent user experience.
 
-Rather than duplicating those patterns across multiple pages, I extracted them into reusable components that could be shared throughout the application. Components such as the Arena Battle Modal, Character Power Progress, Affiliation Badge, and Fighter Slot became building blocks for new features instead of one-off implementations.
+Starting a battle isn't a single state change. Once both fighters are selected, the Arena moves into its comparison phase, displays a five-second countdown, and only 
+selects a winner after that sequence finishes. The UI needs to update every second without moving the timing logic into the Arena reducer.
 
-Designing the project this way reduced duplication, kept the UI consistent, and made it easier to expand the application without rewriting the same interface patterns for every new screen.
+I separated that responsibility into a useBattleCoordinator hook. The coordinator doesn't determine which characters are fighting or who wins. 
+Instead, it controls when the existing Arena operations happen: onStartBattle begins the comparison phase, while onPickWinner is called once the countdown reaches zero.
+
+```ts 
+
+function handleTimer() {
+  tickerRef.current -= 1
+  setCountDown(tickerRef.current)
+
+  if (tickerRef.current <= 0) {
+    finishBattle()
+  }
+}
+
+function startFight() {
+  tickerRef.current = 5
+  setCountDown(5)
+  onStartBattle()
+
+  if (countdownInterval.current) {
+    clearInterval(countdownInterval.current)
+  }
+
+  countdownInterval.current = setInterval(handleTimer, 1000)
+}
+
+```
+
+The visible countdown is stored in state because each tick needs to update the interface, while refs hold the mutable timer values that need to persist between
+ renders without triggering additional renders. The interval is also cleared when a fight finishes, resets, or the consuming component unmounts so an old timer can't 
+ continue changing a later battle.
+
+This keeps the responsibilities separate: the Arena reducer controls what state the battle is in, while the coordinator controls when the battle moves forward.
+
+</CaseStudySection>
+
+<CaseStudySection
+  id="deciding the winner"
+  title="Balancing power and randomness"
+  date="Updated September 27, 2026"
+>
+
+The Arena wasn't intended to be a power-level calculator where the strongest character automatically wins. If every matchup produced the same result, 
+there would be little reason to replay a battle once the outcome was known. Making every fight completely random created the opposite problem: 
+a character separated from their opponent by several orders of magnitude shouldn't have the same chance of winning as an evenly matched fighter.
+
+I wanted power to establish the advantage without completely determining the outcome. To do that, I compare the fighters using their logarithmic power values and calculate how 
+close the weaker fighter is to the stronger one. That closeness determines the opportunity for an upset, so closely matched fighters create more uncertainty while large power gaps 
+make an upset increasingly unlikely.
+
+```ts
+
+export function decideWinner(left: bigint, right: bigint, luck: number): { winner: 'left' | 'right'; isUpset: boolean } {
+  const strongerIsLeft = left > right
+  const [strong, weak] = strongerIsLeft ? [left, right] : [right, left]
+  const logStrongCharacter = getBigIntLog10(strong)
+  const logWeakCharacter = getBigIntLog10(weak)
+
+  const closeness = logStrongCharacter > 0 ? Math.max(logWeakCharacter / logStrongCharacter, 0.05) : 0
+  const isUpset = luck < closeness * 0.4
+
+
+   const winner = isUpset
+     ? (strongerIsLeft ? 'right' : 'left')
+     : (strongerIsLeft ? 'left' : 'right')
+   return { winner, isUpset }
+}
+
+```
+The effect becomes clearer when comparing two different matchups. Against Mr. Satan at 5,000 Ki, Goku at 90 Septillion is overwhelmingly favored:
+
+```ts 
+
+log10(90 Septillion) ≈ 28.95
+log10(5,000)         ≈ 3.70
+
+closeness = 3.70 / 28.95 ≈ 0.128
+upset chance = 0.128 × 0.4 ≈ 5.1%
+
+```
+
+Mr. Satan therefore has only about a 5% upset chance, while Goku wins roughly 95% of battles.
+
+A much closer matchup produces a very different result. Against Frieza at 52.71 Septillion:
+
+
+```ts 
+
+log10(90 Septillion)    ≈ 28.95
+log10(52.71 Septillion) ≈ 28.72
+
+closeness = 28.72 / 28.95 ≈ 0.992
+upset chance = 0.992 × 0.4 ≈ 39.7%
+
+```
+
+Because the fighters are much closer in power, Frieza has roughly a 40% opportunity to produce an upset. Goku still holds the advantage, but the result is far less predictable.
+
+Power determines the advantage, while randomness introduces uncertainty in proportion to the matchup. This keeps extreme mismatches heavily weighted toward the stronger 
+fighter without making closely matched battles predetermined.
+
 
 </CaseStudySection>
