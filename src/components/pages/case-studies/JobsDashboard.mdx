@@ -1,0 +1,70 @@
+import CaseStudyHeader from '@/components/case-study/CaseStudyHeader'
+import CaseStudySection from '@/components/case-study/CaseStudySection'
+
+<CaseStudyHeader
+  projectType="Full Stack Application"
+  title="Jobs application table"
+  summary="A full-stack job application tracker built to organize opportunities, manage application statuses, and identify applications that have gone without a response."
+  stack={[
+    'React',
+    'TypeScript',
+    'Node.js',
+    'Express',
+    'Tailwind CSS',
+    'Shadcn/ui',
+    'postgres'
+  ]}
+  githubLink="https://github.com/aguirreMan/jobs-table-dashboard"
+/>
+
+<CaseStudySection
+  id="database-design"
+  title="Defining the database"
+  date="updated November 7, 2026"
+>
+The first step in building Jobs Dashboard was deciding how to structure the application data.
+
+I wanted to track more than just a company name and job title. Each application needed information about when I applied, where the position was located, its current status, and how I evaluated the opportunity.
+
+I chose PostgreSQL to store this information in a relational database and created an `applications` table to represent individual job applications.
+
+The table includes fields such as `company`, `role`, `location`, `applied_date`, `difficulty`, `status`, `application_type`, `source`, and `notes`.
+
+I also defined a set of values for fields such as application status and difficulty. For example, an application's status could be `active`, `contacted`, or `rejected`, while difficulty could be `fair-game`, `reach`, or `moonshot`.
+
+By defining the data model first, I had a clear structure to build the Express API and React interface around.
+
+</CaseStudySection>
+
+<CaseStudySection
+id="computing-ghosted-status"
+title="computing ghosted status"
+date="updated November 7, 2026"
+>
+One feature I wanted in Jobs Dashboard was the ability to identify applications that had gone more than 30 days without a response.
+
+The database stores three manually managed statuses: active, contacted, and rejected. However, ghosted is different because it depends on the application's age rather than a status I explicitly assign.
+
+Instead of storing ghosted as another value in the applications table, I created a PostgreSQL view called applications_with_computed_status.
+
+The view uses a SQL CASE expression to calculate an additional field named effective_status:
+
+```sql
+CASE
+  WHEN status = 'active'::text
+    AND applied_date < (CURRENT_DATE - '30 days'::interval)
+  THEN 'ghosted'::text
+  ELSE status
+END AS effective_status
+```
+
+If an application is still active and its application date is more than 30 days old, PostgreSQL returns ghosted as its effective status. Otherwise, it returns the original status.
+
+This approach preserves the underlying application data while allowing the dashboard to display a status based on the current date.
+
+It also avoids the need for a scheduled task to update records as they age. The status is calculated whenever the view is queried.
+
+The result is a separation between the status I manage manually and the status the application derives from its business rules.
+
+</CaseStudySection>
+

@@ -691,3 +691,126 @@ Rather than treating that as the same problem, I am treating it as the next stag
 As useChat became more focused on coordinating the message lifecycle, I also moved the lower-level stream parsing into readStream, keeping the hook responsible for orchestration rather than the mechanics of decoding SSE events.
 
 </CaseStudySection>
+
+<CaseStudySection
+id="refining-chat-request-lifecycle"
+title="refining chat request lifecycle"
+date="Updated November 7, 2026"
+>
+As Gorilla AI's chat architecture evolved, useChat became responsible for coordinating a smaller set of concerns: loading persisted messages, managing temporary 
+streaming state, sending requests, handling cancellation, and synchronizing the interface after generation.
+
+Rather than storing everything in one reducer, I separated responsibilities based on the lifetime and ownership of the data.
+
+TanStack Query manages persisted messages retrieved from the server. A reducer manages messages that temporarily exist during streaming. 
+An AbortController, stored alongside a unique request ID in a ref, tracks the active generation request.
+
+```ts
+const [pendingMessages, dispatch] = useReducer(chatReducer, [])
+
+const { messages: fetchedMessages } = useFetchMessages(chatId)
+
+const displayMessages = [...fetchedMessages, ...pendingMessages]
+```
+
+One challenge was preventing asynchronous work from an older conversation from interfering with the current one.
+
+For example, switching conversations while an AI response is streaming can leave an earlier request finishing or cleaning up after the interface has moved to another conversation.
+
+I introduced request identity tracking so cleanup only applies to the request that is still active.
+
+Earlier in the application, I stored only an AbortController in a ref to cancel an active streaming request.
+```ts 
+const activeRequestRef = useRef<AbortController | null>(null)   
+```
+
+As the chat lifecycle became more complex, I needed to track more than cancellation. An older request could finish its asynchronous work after another request had started, potentially clearing the newer request's streaming state.
+
+I changed the ref to track the request ID, conversation ID, and AbortController together.
+
+```ts
+const activeRequestRef = useRef<{
+  id: string
+  conversationId: string
+  abortController: AbortController
+} | null>(null)
+```
+Each property serves a different purpose. The request ID identifies a specific generation, the conversation ID associates it with a conversation, 
+and the AbortController provides cancellation.
+
+The request ID allows me to verify that an asynchronous operation still belongs to the active request before performing cleanup.
+
+```ts
+if (activeRequestRef.current?.id === request.id) {
+  await syncMessages(targetChatId)
+  clearIfCurrent(request.id)
+}
+```
+
+The conversation ID handles a different problem. ChatArea lives inside a persistent Next.js dashboard layout, so its useChat instance can survive navigation between /dashboard and /dashboard/[chatId].
+
+When the route changes, I check whether the active request belongs to the selected conversation before cancelling it.
+
+```ts
+useEffect(() => {
+  const request = activeRequestRef.current
+
+  if (request?.conversationId === chatId) return
+
+  request?.abortController.abort()
+  activeRequestRef.current = null
+
+  dispatch({ type: 'RESET_PENDING_MESSAGES' })
+  setStreaming(false)
+}, [chatId])
+```
+This allows the first message to create a conversation and navigate to its route without automatically cancelling the generation associated with that conversation. 
+Navigating to a different conversation, however, cancels the previous active request.
+
+Continuing to refine synchronization
+
+The resulting architecture has clearer responsibilities, but synchronization remains an important consideration.
+
+Persisted and temporary messages are still separate collections, and the transition between them requires careful coordination to avoid stale or duplicated messages. Request identity currently protects cleanup, but I'm continuing to examine how stale streaming callbacks should be handled as well.
+
+I'm getting a better understanding of state ownership, how long different types of state need to exist, and how asynchronous operations can interfere with one another.
+
+</CaseStudySection>
+
+<CaseStudySection
+id="Separating-conversation-creation-from-chat-orchestration"
+title="seperating conversation creation from chat orchestration"
+date="Updated November 7, 2026"
+>
+
+As I continued refactoring Gorilla AI, I introduced ChatArea to coordinate the chat interface without making the dashboard layout responsible for every conversation-specific operation.
+
+ChatArea connects the active route to useChat, renders the message history and input components, and handles the difference between starting a new conversation and continuing an existing one.
+
+One design decision was to avoid creating empty conversations when users navigate to /dashboard. Instead, the first submitted message triggers conversation creation.
+
+```ts 
+
+const conversation = await createConversation()
+
+router.replace(`/dashboard/${conversation.id}`)
+
+void queryClient.invalidateQueries({
+  queryKey: ['conversations'],
+})
+
+await chat.sendMessage(message, conversation.id)
+```
+For an existing conversation, the component can send the message directly using the current route ID.
+
+I also introduced a ref to guard against duplicate conversation creation while the initial request is pending.
+
+This separation keeps conversation creation and navigation in ChatArea, while useChat remains responsible for the streaming request lifecycle, 
+temporary message state, cancellation, and synchronization with persisted messages.
+
+One area I'm continuing to examine is how route transitions interact with in-flight requests, particularly when the first message creates a conversation and 
+immediately starts streaming.
+
+
+
+</CaseStudySection>

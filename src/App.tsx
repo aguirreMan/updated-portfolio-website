@@ -7,6 +7,7 @@ import NotFound from '@/components/pages/NotFound'
 import CaseStudyLayout from '@/components/case-study/CaseStudyLayout'
 import Recipe from '@/components/pages/case-studies/Recipe.mdx'
 import Gorilla from '@/components/pages/case-studies/Gorilla.mdx'
+import JobsDashboard from '@/components/pages/case-studies/JobsDashboard.mdx'
 import DragonBallz from '@/components/pages/case-studies/DragonBallz.mdx'
 import GoogleAnalyticsTracker from '@/components/page-components/GoogleAnalyticsTracker'
 
@@ -27,6 +28,9 @@ function App() {
           </Route>
           <Route path="projects/gorilla-ai" element={<CaseStudyLayout key='gorilla-ai' />}>
             <Route index element={<Gorilla />} />
+          </Route>
+          <Route path="projects/jobs-dashboard" element={<CaseStudyLayout key='jobs-dashboard' />}>
+            <Route index element={<JobsDashboard />} />
           </Route>
           <Route path="projects/dragon-ballz" element={<CaseStudyLayout key='DragonBallz-study' />}>
             <Route index element={<DragonBallz />} />

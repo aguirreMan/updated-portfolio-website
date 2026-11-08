@@ -6,12 +6,18 @@ import { Button } from '@/components/ui/button'
 const projectData = [
   {
     title: 'Gorilla AI',
-    isFeatured: true,
     description: 'AI-powered learning platform that adapts conversations to a user’s skill level while supporting authenticated chat sessions, persistent history, and structured learning workflows.',
     stack: ['Next.js', 'React', 'TypeScript', 'Tailwind', 'shadcn/ui', 'Clerk', 'Supabase', 'Vercel'],
     liveLink: 'https://gorilla-ai-theta.vercel.app/',
     githubLink: 'https://github.com/aguirreMan/gorilla-ai',
     blogSlug: 'gorilla-ai',
+  },
+  {
+    title: 'Jobs Dashboard',
+    description: 'Full-stack job application tracker built with React, TypeScript, Express, and PostgreSQL. Supports CRUD operations, application filtering, search, and automatic ghosted-status tracking.',
+    stack: ['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'shadcn/ui', 'Node.js', 'Express', 'PostgreSQL', 'Railway'],
+    githubLink: 'https://github.com/aguirreMan/jobs-table-dashboard',
+    blogSlug: 'jobs-dashboard',
   },
   {
     title: 'Recipe App',
@@ -46,9 +52,7 @@ export default function Projects() {
         </div>
         <div className="grid md:grid-cols-2 gap-8">
           {projectData.map((project) => (
-            <ProjectCard key={project.title}
-              className={project.isFeatured ? 'md:col-span-2' : 'md:col-span-1'}
-              {...project} />
+            <ProjectCard key={project.title} {...project} />
           ))}
         </div>
         <div className='flex justify-center pt-14'>

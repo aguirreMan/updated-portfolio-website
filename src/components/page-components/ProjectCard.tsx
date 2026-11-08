@@ -10,35 +10,25 @@ interface ProjectCardProps {
   title: string
   description: string
   stack: string[]
-  liveLink: string
-  githubLink: string
+  liveLink?: string
+  githubLink?: string
   blogSlug?: string
-  isFeatured?: boolean
 }
 
 export default function ProjectCard({
-    className,
-    title,
-    description,
-    stack,
-    liveLink,
-    githubLink,
-    blogSlug,
-    isFeatured, }: ProjectCardProps) {
+  className,
+  title,
+  description,
+  stack,
+  liveLink,
+  githubLink,
+  blogSlug,
+}: ProjectCardProps) {
+
   return (
-    <Card className={cn('flex flex-col hover:-translate-y-1 transition-all duration-200',
-      isFeatured ? "border-primary/40 bg-card shadow-lg" : "", className)}>
+    <Card className={cn('flex flex-col hover:-translate-y-1 transition-all duration-200', className)}>
       <CardHeader>
-        {isFeatured && (
-          <Badge className="text-xs uppercase tracking-widest mb-2">
-            Flagship Project
-          </Badge>
-        )}
-        <CardTitle className={cn(
-          'text-xl',
-          isFeatured && 'text-2xl',
-        )}
-        >
+        <CardTitle className="text-xl">
           {title}
         </CardTitle>
         <p className="text-sm leading-6 text-muted-foreground">{description}</p>
@@ -53,17 +43,26 @@ export default function ProjectCard({
           </Badge>
         ))}
       </CardContent>
-      <CardFooter className="mt-auto flex items-center gap-3">
-        <Button size="sm" asChild>
-          <a href={liveLink} target="_blank" rel="noopener noreferrer">
-            <ExternalLink size={13} className="mr-1.5" /> Live
-          </a>
-        </Button>
-        <Button size="sm" variant="secondary" asChild>
-          <a href={githubLink} target="_blank" rel="noopener noreferrer">
-            Code
-          </a>
-        </Button>
+      <CardFooter className="mt-auto flex flex-wrap items-center gap-3 min-h-8">
+        {liveLink && (
+          <Button size="sm" asChild>
+            <a
+              href={liveLink}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <ExternalLink size={13} className="mr-1.5" />
+              Live
+            </a>
+          </Button>
+        )}
+        {githubLink && (
+          <Button size="sm" variant="secondary" asChild>
+            <a href={githubLink} target="_blank" rel="noopener noreferrer">
+              Code
+            </a>
+          </Button>
+        )}
         {blogSlug && (
           <Link
             to={`/projects/${blogSlug}`}
