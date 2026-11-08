@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import { Coffee } from 'lucide-react'
 import { FieldSet } from '@/components/ui/field'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -26,7 +25,7 @@ export default function Contact() {
   }, [])
 
   function formChange(event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) {
-    setFormFields(prev => ({ ...prev, [event.target.name]: event.target.value}))
+    setFormFields(prev => ({ ...prev, [event.target.name]: event.target.value }))
   }
 
   function encode(data: Record<string, string>) {
@@ -56,86 +55,126 @@ export default function Contact() {
       if (error instanceof Error && error.name === 'AbortError') return
       setErrorForm('Something went wrong. Please try again or email me directly.')
     } finally {
-      setSubmitting(false)
+      if (abortRef.current === controller) {
+        abortRef.current = null
+        setSubmitting(false)
+      }
     }
   }
 
-  if (formSubmit) {
-    return (
-      <div className="flex flex-col items-center min-h-screen px-6 md:px-24 justify-center bg-background">
-        <h1 className="flex flex-row gap-2 text-4xl text-foreground">
-          Let's grab a cup of{' '}
-          <Coffee className="w-10 h-10 text-amber-950" strokeWidth={2.5} />
-        </h1>
-        <p className="text-xl text-muted-foreground">Thank you for your message!</p>
-      </div>
-    )
-  }
+
+  const contactEmail = 'aguirreman98@gmail.com'
 
   return (
-    <div
-      className="flex flex-col min-h-screen items-center px-6 md:px-24 justify-center bg-background">
-      <h1 className="flex flex-row gap-2 text-4xl text-foreground">
-        Let's grab a cup of{' '}
-        <Coffee className="w-10 h-10 text-amber-950" strokeWidth={2.5} />
-      </h1>
-      <form
-        name="contact"
-        method="POST"
-        data-netlify="true"
-        data-netlify-honeypot="bot-field"
-        onSubmit={submitForm}
-        className="w-full max-w-md mb-8 flex flex-col gap-4 pt-4"
+    <section
+      aria-labelledby="contact-heading"
+      className="flex min-h-screen flex-col items-center justify-center
+               bg-background px-6 pt-28 pb-16 md:px-24"
+    >
+      <h1
+        id="contact-heading"
+        className="text-center text-4xl font-bold text-foreground"
       >
-        <Input type="hidden" name="form-name" value="contact" />
-        <input type="hidden" name="bot-field" />
+        Let’s work together
+      </h1>
 
-        <FieldSet>
-          <Label className="font-medium text-sm">Name</Label>
-          <Input
-            name="name"
-            type="text"
-            required
-            value={formFields.name}
-            onChange={formChange}
-            className=" border transition-all duration-200"
-          />
-        </FieldSet>
-        <FieldSet>
-          <Label className="text-foreground font-medium text-sm">Email</Label>
-          <Input
-            name="email"
-            type="email"
-            required
-            value={formFields.email}
-            onChange={formChange}
-            className="transition-all duration-200"
-          />
-        </FieldSet>
-        <FieldSet>
-          <Label className="text-foreground font-medium text-sm">
-            Message
-          </Label>
-          <Textarea
-            name="message"
-            placeholder="Send message here"
-            required
-            value={formFields.message}
-            onChange={formChange}
-            className="transition-all duration-200 leading-relaxed"
-          />
+      <p className="mt-4 max-w-md text-center text-muted-foreground">
+        Have a frontend opportunity or project in mind? Send a message
+        or email me directly.
+      </p>
 
-          {errorForm && <p className="text-sm text-red-500 mt-2">{errorForm}</p>}
-        </FieldSet>
-        <Button
-          className="w-full cursor-pointer"
-          size="lg"
-          type="submit"
-          disabled={submitting}
+      <a
+        href={`mailto:${contactEmail}`}
+        className="mt-3 break-all rounded-sm text-blue-400 underline
+                 underline-offset-4 focus-visible:outline-2
+                 focus-visible:outline-offset-4
+                 focus-visible:outline-accent-blue"
+      >
+        {contactEmail}
+      </a>
+
+      <p
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="mt-4 max-w-md text-center text-foreground"
+      >
+        {formSubmit
+          ? 'Thank you! Your message was submitted successfully.'
+          : submitting
+            ? 'Sending your message…'
+            : ''}
+      </p>
+
+      <p
+        role="alert"
+        aria-atomic="true"
+        className="max-w-md text-center text-red-400"
+      >
+        {errorForm ?? ''}
+      </p>
+
+      {!formSubmit && (
+        <form
+          name="contact"
+          method="POST"
+          data-netlify="true"
+          data-netlify-honeypot="bot-field"
+          onSubmit={submitForm}
+          aria-busy={submitting}
+          className="mb-8 flex w-full max-w-md flex-col gap-4 pt-6"
         >
-          {submitting ? 'Sending...' : 'Send Message'}
-        </Button>
-      </form>
-    </div>
+          <input type="hidden" name="form-name" value="contact" />
+          <input type="hidden" name="bot-field" />
+
+          <FieldSet>
+            <Label htmlFor="contact-name">Name</Label>
+            <Input
+              id="contact-name"
+              name="name"
+              type="text"
+              autoComplete="name"
+              required
+              value={formFields.name}
+              onChange={formChange}
+            />
+          </FieldSet>
+
+          <FieldSet>
+            <Label htmlFor="contact-email">Email</Label>
+            <Input
+              id="contact-email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              value={formFields.email}
+              onChange={formChange}
+            />
+          </FieldSet>
+
+          <FieldSet>
+            <Label htmlFor="contact-message">Message</Label>
+            <Textarea
+              id="contact-message"
+              name="message"
+              required
+              value={formFields.message}
+              onChange={formChange}
+              className="min-h-36 leading-relaxed"
+            />
+          </FieldSet>
+
+          <Button
+            className="w-full"
+            size="lg"
+            type="submit"
+            disabled={submitting}
+          >
+            {submitting ? 'Sending…' : 'Send message'}
+          </Button>
+        </form>
+      )}
+    </section>
   )
 }
