@@ -21,8 +21,6 @@ export default function CaseStudyLayout() {
   const [activeSection, setActiveSection] = useState('')
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-
     const elements = Array.from(contentRef.current?.querySelectorAll<HTMLElement>('section[id]') ?? [])
 
     setSections(
@@ -64,7 +62,7 @@ export default function CaseStudyLayout() {
         <div className='flex gap-12'>
           {sections.length > 0 && (
             <aside className='hidden md:block w-40 flex-shrink-0'>
-              <nav className='sticky top-24 flex flex-col gap-1'>
+              <nav aria-label="Case study sections" className='sticky top-24 flex flex-col gap-1'>
                 {sections.map(({ id, label }) => {
                   const isActive = activeSection === id
                   return (
@@ -72,11 +70,10 @@ export default function CaseStudyLayout() {
                       key={id}
                       href={`#${id}`}
                       aria-current={isActive ? 'location' : undefined}
-                      className={`text-xs border-l-2 pl-3 py-1 transition-all duration-200 ${
-                        isActive
-                          ? 'text-foreground border-primary'
-                          : 'text-muted-foreground border-border hover:text-foreground'
-                      }`}
+                      className={`text-xs border-l-2 pl-3 py-1 transition-all duration-200 ${isActive
+                        ? 'text-foreground border-primary'
+                        : 'text-muted-foreground border-border hover:text-foreground'
+                        }`}
                     >
                       {label}
                     </a>

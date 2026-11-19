@@ -11,6 +11,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const dialog = dialogRef.current
+    const trigger = triggerRef.current
     if (!dialog || !isOpen) return
 
     const previousOverflow = document.body.style.overflow
@@ -30,7 +31,7 @@ export default function Navbar() {
 
       if (dialog.open) dialog.close()
 
-      if (!desktop.matches) triggerRef.current?.focus()
+      if (!desktop.matches) trigger?.focus()
     }
   }, [isOpen])
 
@@ -44,6 +45,7 @@ export default function Navbar() {
         <Link
           to="/"
           className="text-lg font-semibold tracking-wide text-foreground"
+          aria-label='Home'
         >
           MA
         </Link>
