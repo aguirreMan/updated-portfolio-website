@@ -4,10 +4,6 @@ import { MDXProvider } from '@mdx-js/react'
 import { ArrowLeft } from 'lucide-react'
 import { mdxComponents } from '@/components/case-study/mdxComponents'
 
-const NAV_LABELS: Record<string, string> = {
-  differently: 'If I started over',
-  future: 'Future work',
-}
 
 interface Section {
   id: string
@@ -27,8 +23,7 @@ export default function CaseStudyLayout() {
       elements.map((element) => ({
         id: element.id,
         label:
-          NAV_LABELS[element.id] ??
-          element.querySelector('h2')?.textContent?.trim() ??
+          element.querySelector('h2')?.textContent?.trim() ||
           element.id,
       }))
     )

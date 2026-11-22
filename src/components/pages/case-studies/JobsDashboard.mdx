@@ -68,3 +68,399 @@ The result is a separation between the status I manage manually and the status t
 
 </CaseStudySection>
 
+<CaseStudySection
+  id="express-api"
+  title="Designing the Express API"
+  date="updated November 21, 2026"
+>
+
+With the database structure established, the next step was 
+building an Express API to manage job applications.
+
+I organized the backend logic into controllers responsible 
+for creating, retrieving, updating, and deleting applications. 
+Each controller handles request validation, database 
+operations, and HTTP responses.
+
+To establish a validation boundary between the client and 
+the database, I typed incoming request bodies as `unknown` 
+and validated their contents before executing database queries.
+
+```ts 
+
+export async function createApplication(
+  req: Request<unknown, unknown, unknown>,
+  res: Response
+) {
+  const body = req.body
+
+  if (typeof body !== 'object' || body === null || Array.isArray(body)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid request body'
+    })
+  }
+
+  const application = body as Record<string, unknown>
+
+  // Field validation and database operations
+}
+
+```
+
+This includes checking required fields, permitted application 
+statuses, difficulty levels, application types, and preventing 
+application dates from being set in the future.
+
+The controllers also enforce application-specific business 
+rules. For example, clients cannot manually assign the 
+`ghosted` status because it is derived from the application 
+date rather than stored as a writable status.
+
+Another architectural decision was to separate where 
+application data is written from where it is retrieved.
+
+Create and update operations modify the underlying 
+`applications` table. After a successful write, the controller 
+queries the `applications_with_computed_status` view before 
+returning the record to the frontend.
+
+This ensures that the frontend receives a consistent 
+representation of application data, including its computed 
+status, without duplicating that business logic in React.
+
+The controllers use parameterized SQL queries and distinguish 
+between invalid requests, missing records, and unexpected 
+database failures through HTTP status codes.
+
+</CaseStudySection>
+
+<CaseStudySection
+  id="consistent-api-responses"
+  title="Maintaining Consistent API Responses"
+  date="updated November 21, 2026"
+>
+
+One of the more challenging bugs I encountered involved 
+an inconsistency between the data returned by the create 
+and retrieve endpoints.
+
+The POST endpoint originally returned a record directly 
+from the `applications` table, while the GET endpoint 
+retrieved records from the 
+`applications_with_computed_status` view.
+
+As a result, newly created applications were missing the 
+`effective_status` field until the page was refreshed.
+
+The underlying issue was not that the application had failed to save, but that the API returned two different 
+representations of the same resource.
+
+```json 
+{
+  "id": 42,
+  "status": "active"
+}
+
+
+{
+  "id": 42,
+  "status": "active",
+  "effective_status": "active"
+}
+
+```
+
+To resolve this, I modified the create controller to return the newly generated ID after the INSERT operation 
+and use that ID to retrieve the application from the view.
+
+```ts
+const createdResult = await pool.query(
+  `SELECT *
+   FROM applications_with_computed_status
+   WHERE id = $1`,
+  [result.rows[0].id]
+)
+
+return res.status(201).json(createdResult.rows[0])
+```
+
+I applied the same approach to the update controller, ensuring that create, update, and retrieve operations 
+return a consistent application shape.
+
+This keeps the computed status logic within PostgreSQL and avoids requiring the frontend to reconstruct missing 
+fields or refresh the entire dataset after a mutation.
+
+</CaseStudySection>
+
+<CaseStudySection
+  id="partial-updates"
+  title="Supporting Partial Application Updates"
+  date="updated November 21, 2026"
+>
+
+An important usability consideration was reducing friction 
+when managing existing applications.
+
+Updating an application should not require filling out an 
+entire form again. In many cases, I only need to change its 
+status, update a note, or correct a job title.
+
+To support this workflow, I designed the update controller 
+to accept individual fields or combinations of fields 
+rather than require a complete application object.
+
+The challenge was constructing a SQL query that could 
+accommodate different combinations of updated fields safely.
+
+I defined an allowlist of editable fields, validated the 
+supplied values, and dynamically constructed the SQL 
+SET clause.
+
+```ts
+const updatedResult = await pool.query(
+  `UPDATE applications
+   SET ${suppliedFields.map((field, index) =>
+     `${field} = $${index + 1}`).join(', ')}
+   WHERE id = $${suppliedFields.length + 1}
+   RETURNING *`,
+  [...suppliedFields.map(field => updates[field]), applicationId]
+)
+```
+
+Column names are restricted to the predefined allowlist, 
+while application values are passed as parameterized 
+query arguments.
+
+This allows a single controller to handle different update 
+operations while preserving any fields that were not 
+included in the request.
+
+</CaseStudySection>
+
+<CaseStudySection
+  id="application-state"
+  title="Managing Application State"
+  date="updated November 21, 2026"
+>
+
+I centralized the application collection within the root 
+React component, allowing the dashboard to maintain a 
+single source of truth for application data.
+
+Child components receive application data and communicate 
+changes through callbacks, while maintaining their own 
+local state for presentation and interaction.
+
+One important decision was how to synchronize frontend 
+state after creating, updating, or deleting an application.
+
+Rather than refetching the entire collection after every 
+successful operation, I update the existing application 
+state using the result of the API request.
+
+For example, after updating an application's status, the 
+backend returns the updated record, which replaces the 
+existing application in state.
+
+```tsx
+setApplications((prev) =>
+  prev.map((application) =>
+    application.id === id ? updatedApplication : application
+  )
+)
+```
+
+Creating applications adds the returned record to the 
+collection, while deleting applications removes the 
+corresponding record by ID.
+
+These state changes occur only after the server confirms 
+that the operation was successful.
+
+This approach also reinforces the importance of consistent 
+API response shapes, since the frontend relies on the 
+returned application data to synchronize its local state 
+with the database.
+
+</CaseStudySection>
+
+<CaseStudySection
+  id="table-architecture"
+  title="Building the Interactive Applications Table"
+  date="updated November 21, 2026"
+>
+
+The applications table serves as the primary interface 
+for managing job applications.
+
+I built the table using native HTML table elements and 
+React, with dedicated components for searching, changing 
+application statuses, and managing individual records.
+
+The table maintains local state for search queries, status 
+filters, and expanded notes, while receiving application 
+data and mutation handlers through its props.
+
+Rather than storing filtered applications separately, I 
+derive the displayed records from the existing application 
+data and the current filter values.
+
+```tsx
+const filteredApplications = applications.filter((application) => {
+  const matchesSearch =
+    application.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    application.role.toLowerCase().includes(searchQuery.toLowerCase())
+
+  const matchesStatus =
+    statusFilter === 'all' ||
+    application.effective_status === statusFilter
+
+  return matchesSearch && matchesStatus
+})
+```
+
+This allows search and status filtering to work together 
+without maintaining a separate copy of the application data.
+
+The table also preserves the distinction between stored 
+and computed application statuses established in the backend.
+
+Row colors, status labels, filter categories, and application 
+counts use the computed effective status, while the status 
+selector operates on the underlying user-managed status.
+
+This allows the frontend to present computed application 
+data without duplicating the business logic responsible 
+for calculating ghosted applications.
+
+</CaseStudySection>
+
+<CaseStudySection
+  id="application-forms"
+  title="Designing Reusable Application Forms"
+  date="updated November 21, 2026"
+>
+
+Creating and editing job applications share many of the
+same input fields, validation requirements, and submission
+behaviors.
+
+Rather than maintaining separate form implementations, I
+built a reusable `ApplicationForm` that supports both
+workflows.
+
+The form is responsible for input state, validation, and
+submission logic, while its surrounding components manage
+dialog visibility and user interactions.
+
+### Defining the form data
+
+I separated form data from the full application record
+using TypeScript's `Omit` utility type. This excludes
+properties managed elsewhere in the application without
+maintaining a duplicate type definition.
+
+```ts
+type FormData = Omit<
+  ApplicationProps,
+  'id' | 'notes' | 'status' | 'effective_status' | 'created_at'
+> & { notes: string }
+```
+
+The notes property is redefined as a string to maintain
+a consistent value for the controlled textarea, even when
+an existing application does not contain notes.
+
+### Supporting creation and editing workflows
+
+When an existing application is provided, the form
+initializes its fields with the application's current
+values. Otherwise, it uses default values for creating
+a new record.
+
+```tsx
+const [formData, setFormData] = useState<FormData>(
+  application
+    ? {
+        company: application.company,
+        role: application.role,
+        location: application.location,
+        applied_date: application.applied_date.slice(0, 10),
+        difficulty: application.difficulty,
+        application_type: application.application_type,
+        source: application.source,
+        notes: application.notes ?? '',
+      }
+    : initialFormData
+)
+```
+
+Existing application data is normalized into values
+suitable for the form inputs. The application date is
+converted into the format expected by the date input,
+while missing notes are represented as an empty string.
+
+The submission method and API endpoint are determined
+by the current workflow.
+
+```tsx
+const isEditing = application !== undefined
+const method = isEditing ? 'PATCH' : 'POST'
+
+const url = isEditing
+  ? `http://localhost:3000/api/applications/${application.id}`
+  : 'http://localhost:3000/api/applications'
+```
+
+Both workflows share the same submission logic, input
+components, and validation requirements, reducing
+duplication between creation and editing.
+
+Validation is handled through native HTML input
+constraints, client-side checks, and runtime validation
+on the Express backend.
+
+### Managing the form lifecycle
+
+Another consideration was managing temporary form state
+between editing sessions.
+
+Since the form initializes its state from the supplied
+application, keeping the form mounted could retain unsaved
+changes when reopening the editing dialog.
+
+To address this, the `ApplicationEditor` conditionally
+renders the form when its dialog is open.
+
+```tsx
+{open && (
+  <ApplicationForm
+    application={application}
+    onUpdated={(updated) => {
+      onUpdated(updated)
+      onOpenChange(false)
+    }}
+  />
+)}
+```
+
+Closing the dialog unmounts the form and discards its
+temporary state. Subsequent editing sessions initialize
+with the current application data without requiring an
+additional effect to synchronize form state with props.
+
+After a successful submission, the form communicates the
+saved application through a callback. The centralized
+application collection is updated, and the editing
+dialog closes.
+
+Destructive actions are handled separately through a
+confirmation dialog to reduce the risk of accidental
+deletion.
+
+This separation keeps form logic reusable while allowing
+each surrounding component to manage its own interaction
+and presentation requirements.
+
+</CaseStudySection>
