@@ -14,9 +14,10 @@ export default function Home() {
     <>
       <section aria-labelledby="home-heading" className="relative w-full overflow-hidden">
         <img
-          src="/assets/hero.png"
+          src="/assets/hero.webp"
           alt=""
           className="absolute inset-0 w-full h-full object-cover z-[1]"
+          fetchPriority="high"
         />
 
         <div

@@ -28,25 +28,34 @@ export default function Contact() {
     setFormFields(prev => ({ ...prev, [event.target.name]: event.target.value }))
   }
 
-  function encode(data: Record<string, string>) {
-    return Object.keys(data)
-      .map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(data[key])).join('&')
-  }
-
   async function submitForm(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setErrorForm(null)
-    setSubmitting(true)
+
+    if (submitting) return
+
+    const formData = new FormData(event.currentTarget)
+    const body = new URLSearchParams()
+
+    formData.forEach((value, key) => {
+      if (typeof value === 'string') {
+        body.append(key, value)
+      }
+    })
 
     abortRef.current?.abort()
     const controller = new AbortController()
     abortRef.current = controller
 
+    setErrorForm(null)
+    setSubmitting(true)
+
+
+
     try {
       const response = await fetch('/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: encode({ 'form-name': 'contact', ...formFields }),
+        body: body.toString(),
         signal: controller.signal,
       })
       if (!response.ok) throw new Error('Failed to submit form')
@@ -124,8 +133,17 @@ export default function Contact() {
           aria-busy={submitting}
           className="mb-8 flex w-full max-w-md flex-col gap-4 pt-6"
         >
+          <div hidden>
+            <label>
+              Leave this field empty:
+              <input
+                type="text"
+                name="bot-field"
+                autoComplete="off"
+              />
+            </label>
+          </div>
           <input type="hidden" name="form-name" value="contact" />
-          <input type="hidden" name="bot-field" />
 
           <FieldSet>
             <Label htmlFor="contact-name">Name</Label>

@@ -6,13 +6,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description"
     content="Frontend developer building modern web applications with React, TypeScript, and scalable architecture." />
-  <title>Manuel Aguirre | Frontend Developer</title>
+
+  <!-- Social sharing (Open Graph: LinkedIn, Facebook, Slack, Discord, iMessage) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Manuel Aguirre" />
+  <meta property="og:title" content="Manuel Aguirre | Frontend Developer" />
+  <meta property="og:description"
+    content="Frontend developer building modern web applications with React, TypeScript, and scalable architecture." />
+  <meta property="og:image" content="https://manuelaguirre.dev/og-image.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Manuel Aguirre, Frontend Developer portfolio" />
+
+  <!-- X/Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
 </head>
 
 <body>
   <!-- Static fallback form for Netlify detection -->
-  <form name="contact" method="POST" data-netlify="true" hidden>
+  <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
     <input type="hidden" name="form-name" value="contact" />
+    <input type="text" name="bot-field" />
     <input type="text" name="name" />
     <input type="email" name="email" />
     <textarea name="message"></textarea>

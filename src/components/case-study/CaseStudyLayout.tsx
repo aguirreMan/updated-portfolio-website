@@ -4,14 +4,13 @@ import { MDXProvider } from '@mdx-js/react'
 import { ArrowLeft } from 'lucide-react'
 import { mdxComponents } from '@/components/case-study/mdxComponents'
 
-
 interface Section {
   id: string
   label: string
 }
 
 export default function CaseStudyLayout() {
-  const { pathname } = useLocation()
+  const { pathname, hash } = useLocation()
   const contentRef = useRef<HTMLDivElement>(null)
   const [sections, setSections] = useState<Section[]>([])
   const [activeSection, setActiveSection] = useState('')
@@ -19,30 +18,77 @@ export default function CaseStudyLayout() {
   useEffect(() => {
     const elements = Array.from(contentRef.current?.querySelectorAll<HTMLElement>('section[id]') ?? [])
 
-    setSections(
-      elements.map((element) => ({
+    setSections(elements.map((element) => (
+      {
         id: element.id,
-        label:
-          element.querySelector('h2')?.textContent?.trim() ||
-          element.id,
+        label: element.querySelector('h2')?.textContent?.trim() || element.id,
       }))
     )
     setActiveSection(elements[0]?.id ?? '')
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
-        if (visible[0]) setActiveSection(visible[0].target.id)
-      },
-      { rootMargin: '-96px 0px -65% 0px' }
-    )
+    if (elements.length === 0) return
 
-    elements.forEach((element) => observer.observe(element))
+    let observer: IntersectionObserver | undefined
+    let rootMargin = ''
 
-    return () => observer.disconnect()
+    function observeSections() {
+      const height = document.documentElement.clientHeight
+      const top = Math.min(96, Math.max(0, height - 32))
+      const bottom = Math.min(height, Math.max(top + 32, Math.round(height * 0.35)))
+      // Percentage root margins use viewport width, including on the vertical axis.
+      const nextMargin = `${-top}px 0px ${bottom - height}px 0px`
+      if (nextMargin === rootMargin) return
+
+      rootMargin = nextMargin
+      observer?.disconnect()
+
+      const intersecting = new Set<Element>()
+      observer = new IntersectionObserver((entries, currentObserver) => {
+        if (currentObserver !== observer) return
+
+        for (const { target, isIntersecting } of entries) {
+          if (isIntersecting) intersecting.add(target)
+          else intersecting.delete(target)
+        }
+
+        const firstVisible = elements.find((element) => intersecting.has(element))
+        if (firstVisible) setActiveSection(firstVisible.id)
+      }, { rootMargin })
+
+      for (const element of elements) observer.observe(element)
+    }
+
+    observeSections()
+    window.addEventListener('resize', observeSections)
+
+    return () => {
+      window.removeEventListener('resize', observeSections)
+      observer?.disconnect()
+      observer = undefined
+    }
+
   }, [pathname])
+
+  useEffect(() => {
+    if (!hash) return
+
+    let id: string
+
+    try {
+      id = decodeURIComponent(hash.slice(1))
+    } catch {
+      return
+    }
+
+    const section = document.getElementById(id)
+
+    if (section && contentRef.current?.contains(section)) {
+      section.scrollIntoView({
+        behavior: 'instant',
+        block: 'start',
+      })
+    }
+  }, [pathname, hash])
 
   return (
     <div className='min-h-screen px-6 py-20'>

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import ReactGA from 'react-ga4'
 
-export default function GoogleAnalyticsTracker() {
+export default function GoogleAnalyticsTracker({ title }: { title: string }) {
   const { pathname, search } = useLocation()
 
   useEffect(() => {
@@ -21,9 +21,9 @@ export default function GoogleAnalyticsTracker() {
     ReactGA.send({
       hitType: 'pageview',
       page: pathname + search,
-      title: document.title,
+      title,
     })
-  }, [pathname, search])
+  }, [pathname, search, title])
 
   return null
 }

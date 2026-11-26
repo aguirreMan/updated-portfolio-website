@@ -1,13 +1,23 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, Suspense } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
+import { ErrorBoundary } from './ErrorBoundary'
+import { motion, useReducedMotion } from 'framer-motion'
 import Navbar from './Navbar'
 import Footer from './Footer'
+import Loading from './Loading'
 
 function Layout() {
   const { pathname } = useLocation()
   const mainRef = useRef<HTMLElement>(null)
 
+  const reduceMotion = useReducedMotion()
+
+  const previousPathNameRef = useRef(pathname)
+
   useEffect(() => {
+    if (previousPathNameRef.current === pathname) return
+    previousPathNameRef.current = pathname
+
     if (window.location.hash) return
 
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
@@ -37,9 +47,18 @@ function Layout() {
         tabIndex={-1}
         className="flex-grow focus:outline-none"
       >
-        <Outlet />
+        <ErrorBoundary key={pathname}>
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: reduceMotion ? 0 : 0.18, ease: 'easeOut' }}
+          >
+            <Suspense fallback={<Loading />}>
+              <Outlet />
+            </Suspense>
+          </motion.div>
+        </ErrorBoundary>
       </main>
-
       <Footer />
     </div>
   )

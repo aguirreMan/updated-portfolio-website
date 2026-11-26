@@ -1,9 +1,9 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import tailwindcss from '@tailwindcss/vite';
-import mdx from '@mdx-js/rollup';
-import rehypePrettyCode from 'rehype-pretty-code';
-import path from 'path';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+import mdx from '@mdx-js/rollup'
+import rehypePrettyCode from 'rehype-pretty-code'
+import path from 'path'
 
 export default defineConfig({
   plugins: [
@@ -30,4 +30,4 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'),
     },
   },
-});
+})

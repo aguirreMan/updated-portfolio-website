@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 
 const links = [
   { label: 'Home', to: '/', end: true },
@@ -15,6 +15,8 @@ interface NavLinksProps {
 }
 
 export default function NavLinks({ isMobile = false, onLinkClick }: NavLinksProps) {
+  const reduceMotion = useReducedMotion()
+
   function closeMobileMenu() {
     if (isMobile && onLinkClick) {
       onLinkClick()
@@ -40,7 +42,6 @@ export default function NavLinks({ isMobile = false, onLinkClick }: NavLinksProp
             key={link.to}
             to={link.to}
             end={link.end}
-            viewTransition
             className="relative pb-1"
             onClick={closeMobileMenu}
           >
@@ -56,15 +57,23 @@ export default function NavLinks({ isMobile = false, onLinkClick }: NavLinksProp
                   {link.label}
                 </span>
                 {isActive && !isMobile && (
-                  <motion.div
-                    layoutId="underline"
-                    className="absolute left-0 right-0 -bottom-1 h-[2px] bg-primary"
-                    transition={{
-                      type: 'spring',
-                      stiffness: 500,
-                      damping: 30,
-                    }}
-                  />
+                  reduceMotion ? (
+                    <span
+                      aria-hidden="true"
+                      className="absolute left-0 right-0 -bottom-1 h-[2px] bg-primary"
+                    />
+                  ) : (
+                    <motion.span
+                      aria-hidden="true"
+                      layoutId="underline"
+                      className="absolute left-0 right-0 -bottom-1 h-[2px] bg-primary"
+                      transition={{
+                        type: 'spring',
+                        stiffness: 500,
+                        damping: 30,
+                      }}
+                    />
+                  )
                 )}
               </>
             )}
