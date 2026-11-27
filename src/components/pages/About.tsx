@@ -1,65 +1,112 @@
+
 import { GraduationCap, Code2, Briefcase, MapPin } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 
-const frontendSkills = [
-  'React', 'TypeScript', 'Next.js', 'React Router',
-  'TanStack Query', 'Vite', 'Tailwind CSS', 'shadcn/ui',
+const skillGroups = [
+  {
+    title: 'Frontend engineering',
+    skills: [
+      'React',
+      'TypeScript',
+      'Next.js',
+      'React Router',
+      'TanStack Query',
+      'Tailwind CSS',
+      'shadcn/ui',
+      'Framer Motion',
+    ],
+  },
+  {
+    title: 'Backend & data',
+    skills: [
+      'Node.js',
+      'Express.js',
+      'PostgreSQL',
+    ],
+  },
+  {
+    title: 'Authentication & infrastructure',
+    skills: [
+      'Clerk',
+      'Vercel',
+      'Netlify',
+      'Railway',
+      'Supabase'
+    ],
+  },
+  {
+    title: 'Development tooling',
+    skills: [
+      'Vite',
+      'Git',
+      'GitHub',
+      'ESLint',
+      'Postman',
+    ],
+  },
 ]
-
-const infraSkills = [
-  'Node.js', 'Express', 'Supabase', 'Clerk',
-  'Vercel', 'Netlify', 'Railway', 'Postman',
-]
-
-function Badge({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="text-xs px-2.5 py-1 rounded-md border border-border bg-muted text-muted-foreground">
-      {children}
-    </span>
-  )
-}
 
 export default function About() {
   return (
-    <div className="py-20 px-6">
+    <div className="px-6 py-20">
       <div className="max-w-4xl mx-auto">
-
-        {/* Hero */}
-        <div className="text-center mb-12 pb-10 border-b border-border">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Frontend engineer focused on React & TypeScript
+        <header className="text-center mb-12">
+          <h1 className="mb-4 text-4xl font-bold text-foreground">
+            About me
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6 leading-relaxed">
-            I build responsive interfaces and maintainable frontend systems,
-            focusing on performance, accessibility, and clean component architecture.
+
+          <p className="mx-auto max-w-2xl text-muted-foreground leading-relaxed">
+            I'm a frontend engineer focused on React & TypeScript,
+            building responsive interfaces and maintainable frontend
+            systems with an emphasis on performance and accessibility.
           </p>
-        </div>
+        </header>
 
         {/* Education + Focus */}
         <div className="grid md:grid-cols-2 gap-6 mb-6">
           <Card>
             <CardHeader className="flex flex-row items-center gap-3 pb-3">
-              <GraduationCap className="text-muted-foreground" size={22} />
-              <CardTitle className="text-base">Education</CardTitle>
+              <GraduationCap
+                aria-hidden="true"
+                className="text-muted-foreground"
+                size={22}
+              />
+              <CardTitle className="text-base">
+                <h2>Education</h2>
+              </CardTitle>
             </CardHeader>
+
             <CardContent>
               <p className="font-medium text-foreground mb-1">
                 A.A.S. Web Development
               </p>
-              <p className="text-sm text-muted-foreground">Des Moines Area Community College</p>
-              <p className="text-sm text-muted-foreground">2023 – 2025</p>
+              <p className="text-sm text-muted-foreground">
+                Des Moines Area Community College
+              </p>
+              <p className="text-sm text-muted-foreground">
+                2023 – 2025
+              </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center gap-3 pb-3">
-              <Code2 className="text-muted-foreground" size={22} />
-              <CardTitle className="text-base">Focus</CardTitle>
+              <Code2
+                aria-hidden="true"
+                className="text-muted-foreground"
+                size={22}
+              />
+              <CardTitle className="text-base">
+                <h2>Engineering focus</h2>
+              </CardTitle>
             </CardHeader>
+
             <CardContent>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Focused on scalable React applications, frontend architecture,
-                and building polished developer experiences.
+                Interested in frontend architecture, reusable component systems,
+                asynchronous state management, performance optimization,
+                and accessible user interfaces.
               </p>
             </CardContent>
           </Card>
@@ -68,43 +115,55 @@ export default function About() {
         {/* Skills */}
         <Card className="mb-6">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base text-center">Skills & tooling</CardTitle>
+            <CardTitle className="text-base text-center">
+              <h2>Skills & tooling</h2>
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-5">
-            <div>
-              <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
-                Frontend
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {frontendSkills.map((s) => <Badge key={s}>{s}</Badge>)}
+
+          <CardContent className="grid gap-6 sm:grid-cols-2">
+            {skillGroups.map(({ title, skills }) => (
+              <div key={title}>
+                <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
+                  {title}
+                </h3>
+
+                <ul className="flex flex-wrap gap-2">
+                  {skills.map((skill) => (
+                    <li key={skill}>
+                      <Badge variant="secondary">
+                        {skill}
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
-                Backend & infrastructure
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {infraSkills.map((s) => <Badge key={s}>{s}</Badge>)}
-              </div>
-            </div>
+            ))}
           </CardContent>
         </Card>
 
-        {/* Looking for */}
+        {/* Career interests */}
         <Card>
           <CardHeader className="flex flex-row items-center gap-3 pb-3">
-            <Briefcase className="text-primary" size={22} />
-            <CardTitle className="text-base">What I'm looking for</CardTitle>
+            <Briefcase
+              aria-hidden="true"
+              className="text-primary"
+              size={22}
+            />
+            <CardTitle className="text-base">
+              <h2>What I'm looking for</h2>
+            </CardTitle>
           </CardHeader>
+
           <CardContent>
             <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-              Seeking a collaborative frontend role where I can contribute
-              immediately and keep growing. Currently based in Iowa and
-              targeting opportunities outside of Iowa.
+              Seeking a collaborative frontend engineering role where I can
+              contribute to meaningful products, solve challenging technical
+              problems, and grow alongside experienced engineers.
             </p>
+
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <MapPin size={13} />
-              Iowa → Open to relocation
+              <MapPin aria-hidden="true" size={13} />
+              <span>Based in Iowa · Open to relocation</span>
             </div>
           </CardContent>
         </Card>

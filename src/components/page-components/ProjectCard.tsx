@@ -1,9 +1,13 @@
+
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Link } from 'react-router-dom'
+import { motion, useReducedMotion } from 'framer-motion'
 import { ExternalLink } from 'lucide-react'
 import { cn } from '@/lib/utils'
+
+const MotionCard = motion.create(Card)
 
 interface ProjectCardProps {
   className?: string
@@ -13,7 +17,12 @@ interface ProjectCardProps {
   liveLink?: string
   githubLink?: string
   blogSlug?: string
-  preview?: { src: string; alt: string; width: number; height: number }
+  preview?: {
+    src: string
+    alt: string
+    width: number
+    height: number
+  }
   featured?: boolean
 }
 
@@ -28,31 +37,82 @@ export default function ProjectCard({
   preview,
   featured = false,
 }: ProjectCardProps) {
+  const shouldReduceMotion = useReducedMotion()
 
   return (
-    <Card className={cn('flex flex-col hover:-translate-y-1 transition-all duration-200 motion-reduce:transform-none motion-reduce:transition-none', featured && 'border-t-2 border-t-accent-blue bg-gradient-to-br from-card to-background', className)}>
+    <MotionCard
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+      whileInView={{
+        opacity: 1,
+        y: 0,
+        transition: {
+          duration: 0.4,
+          ease: 'easeOut',
+        },
+      }}
+      whileHover={
+        shouldReduceMotion
+          ? undefined
+          : {
+            y: -4,
+            transition: {
+              type: 'spring',
+              stiffness: 350,
+              damping: 25,
+            },
+          }
+      }
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{
+        type: 'spring',
+        stiffness: 350,
+        damping: 25,
+      }}
+      className={cn(
+        'flex flex-col',
+        featured &&
+        'border-t-2 border-t-accent-blue bg-gradient-to-br from-card to-background',
+        className
+      )}
+    >
       {preview && (
         <div className="px-6">
-          <img src={preview.src} alt={preview.alt} width={preview.width} height={preview.height} loading="lazy" decoding="async" className="aspect-[16/10] w-full rounded-lg border object-contain bg-background" />
+          <img
+            src={preview.src}
+            alt={preview.alt}
+            width={preview.width}
+            height={preview.height}
+            loading="lazy"
+            decoding="async"
+            className="aspect-[16/10] w-full rounded-lg border object-contain bg-background"
+          />
         </div>
       )}
+
       <CardHeader>
-        {featured && <p className="text-xs uppercase tracking-widest text-blue-400">Featured project</p>}
+        {featured && (
+          <p className="text-xs uppercase tracking-widest text-blue-400">
+            Featured project
+          </p>
+        )}
+
         <CardTitle className="text-xl">
           {featured ? <h3>{title}</h3> : <h2>{title}</h2>}
         </CardTitle>
-        <p className="text-sm leading-6 text-muted-foreground">{description}</p>
+
+        <p className="text-sm leading-6 text-muted-foreground">
+          {description}
+        </p>
       </CardHeader>
+
       <CardContent className="flex flex-wrap gap-2">
         {stack.map((tech) => (
-          <Badge
-            key={tech}
-            variant="secondary"
-          >
+          <Badge key={tech} variant="secondary">
             {tech}
           </Badge>
         ))}
       </CardContent>
+
       <CardFooter className="mt-auto flex flex-wrap items-center gap-3 min-h-8">
         {liveLink && (
           <Button size="sm" asChild>
@@ -67,13 +127,19 @@ export default function ProjectCard({
             </a>
           </Button>
         )}
+
         {githubLink && (
           <Button size="sm" variant="secondary" asChild>
-            <a href={githubLink} target="_blank" rel="noopener noreferrer">
+            <a
+              href={githubLink}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Github
             </a>
           </Button>
         )}
+
         {blogSlug && (
           <Link
             to={`/projects/${blogSlug}`}
@@ -84,6 +150,6 @@ export default function ProjectCard({
           </Link>
         )}
       </CardFooter>
-    </Card>
+    </MotionCard>
   )
 }

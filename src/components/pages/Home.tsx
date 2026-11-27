@@ -33,10 +33,16 @@ export default function Home() {
           >
             Frontend Engineer
           </motion.p>
-          <h1 id="home-heading" className="text-4xl md:text-6xl font-bold text-white tracking-wider drop-shadow-md">
+          <h1
+            id="home-heading"
+            aria-label={name}
+            className="text-4xl md:text-6xl font-bold text-white tracking-wider drop-shadow-md"
+          >
             {name.split('').map((character, index) => (
               <motion.span
                 key={index}
+                aria-hidden="true"
+                className="inline-block whitespace-pre"
                 initial={reduceMotion ? false : { opacity: 0, x: -16 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: reduceMotion ? 0 : 0.6, delay: reduceMotion ? 0 : index * 0.07 }}
